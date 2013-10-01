@@ -682,14 +682,9 @@ public:
 		}
 	}
 
-<<<<<<< Updated upstream
-	void calculate_repulsion_for_object(double currentLocation[], double object[], double radius, double repulsion[]){
-		double distance = distance_from_tank_to_point(currentLocation, object);
-=======
 
-	void calcuate_repulsion(double currentLocation[], double object[], double radius, double repulsion[]){
+	void calculate_repulsion_for_object(double currentLocation[], double object[], double radius, double repulsion[]){
 		double distance = distancePoints(currentLocation, object);
->>>>>>> Stashed changes
 		double angle = angle_from_tank_to_point(currentLocation, object);
 		if (distance < radius){
 			cerr << "x value " << currentLocation[0] << " came inside obstacle" << endl;
@@ -704,7 +699,6 @@ public:
 		}
 	}
 
-<<<<<<< Updated upstream
 	void calculate_repulsion(double currentLocation[], double repulsion[]){
 		vector<obstacle_t> obstacles;
 		get_obstacles(obstacles);
@@ -712,7 +706,7 @@ public:
 			//calculate replusion
 		}
 	}
-=======
+
 	void closestPoint(double currentLocation[], obstacle_t obs, double closest[]){
 		double distance;
 		for(int i=0;i<4;i++){
@@ -751,7 +745,6 @@ public:
 	double dot(double x1, double y1, double x2, double y2){
 		return x1*x2 + y1*y2;
 	}
->>>>>>> Stashed changes
 	
 	int Close() {
 		close(sd);
