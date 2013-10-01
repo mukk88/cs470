@@ -622,18 +622,14 @@ public:
 		return true;
 	}
 
-	double distance_from_tank_to_point(int index, double point[]){
-		vector<tank_t> my_tanks;
-		get_mytanks(&my_tanks);
-		return sqrt( pow(my_tanks[index].pos[0] - point[0], 2) + 
-			pow(my_tanks[index].pos[1] - point[1], 2) );	
+	double distance_potential_field(double currentLocation[], double object[]){
+		return sqrt( pow(currentLocation[0] - object[0], 2) + 
+			pow(currentLocation.pos[1] - object[1], 2) );	
 	}
 
-	double angle_from_tank_to_point(int index, double point[]){
-		vector<tank_t> my_tanks;
-		get_mytanks(&my_tanks);
-		return atan2( pow(my_tanks[index].pos[1] - point[1], 2),
-			 pow(my_tanks[index].pos[0] - point[0], 2) );	
+	double angle_potential_field(double currentLocation[], double object[]){
+		return atan2( pow(currentLocation[1] - object[1], 2),
+			 pow(currentLocation[0] - object[0], 2) );	
 	}
 
 	void calcuate_attraction(int index, double goal[], double attraction[]){
@@ -669,7 +665,7 @@ public:
 			repulsion[1] = coefficent * sin(angle);
 		}
 	}
-
+	
 	int Close() {
 		close(sd);
 		return 0;
