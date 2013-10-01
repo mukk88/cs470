@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <ctype.h>
+#include <vector>
 #include "bot.h"
 using namespace std;
 
@@ -15,6 +16,31 @@ void robot_post_update(){
 
 void world_init(BZRC *my_team){
 	if(debugMode) cout << "initializing world\n"; 
+}
+
+void dumbAgents(vector<int> numbots, BZRC& myTeam){
+	for(int i=0;i<numbots.size();i++){
+		myTeam.shoot(numbots[i]);
+		myTeam.speed(numbots[i],10);
+	}
+	sleep(2);
+	for(int i=0;i<numbots.size();i++){
+		myTeam.shoot(numbots[i]);
+	}
+	sleep(2);
+	for(int i=0;i<numbots.size();i++){
+		myTeam.speed(numbots[i], 0);
+		myTeam.shoot(numbots[i]);
+		myTeam.angvel(numbots[i], 0.5);
+	}
+	sleep(2);
+	for(int i=0;i<numbots.size();i++){
+		myTeam.shoot(numbots[i]);
+	}
+	sleep(2);
+	for(int i=0;i<numbots.size();i++){
+		myTeam.angvel(numbots[i], 0);
+	}
 }
 
 
@@ -40,23 +66,35 @@ int main(int argc, char *argv[]) {
         }
     }
 
-	BZRC MyTeam = BZRC(pcHost, port, false);
-	if(!MyTeam.GetStatus()) {
+	BZRC myTeam = BZRC(pcHost, port, false);
+	if(!myTeam.GetStatus()) {
 		cout << "Can't connect to BZRC server." << endl;
 		exit(1);
 	}
 
+	int botnum = 8;
 	if(debugMode) cout << "calling agent code" << endl;
-	// Calling agent code
-	world_init(&MyTeam);
-	for(int i=1; i>0; i++) {
-		// robot_pre_update();
-		// robot_update();
-		robot_post_update();
-		sleep(50);
-	}
 
-	MyTeam.Close();
+	vector<int> botnums;
+	botnums.push_back(2);
+	botnums.push_back(6);
+	while(true){
+		dumbAgents(botnums, myTeam);
+	}
+	
+
+
+
+	// Calling agent code
+	// world_init(&MyTeam);
+	// for(int i=1; i>0; i++) {
+	// 	// robot_pre_update();
+	// 	// robot_update();
+	// 	robot_post_update();
+	// 	sleep(50);
+	// }
+
+	// MyTeam.Close();
 	// free(&MyTeam);
 	return 0;
 }
