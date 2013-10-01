@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <vector>
-#include "bot.h"
+#include "createplot.h"
 using namespace std;
 
 const char *kDefaultServerName = "localhost";
@@ -71,6 +71,14 @@ int main(int argc, char *argv[]) {
 		cout << "Can't connect to BZRC server." << endl;
 		exit(1);
 	}
+
+	vector<obstacle_t> obs;
+	bool result = myTeam.get_obstacles(obs);
+	if(result){
+		mainPrint(obs);
+	}
+	
+
 
 	int botnum = 8;
 	if(debugMode) cout << "calling agent code" << endl;
