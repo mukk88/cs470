@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
+#include <cmath>
 #include "math.h"
 
 using namespace std;
@@ -94,6 +95,11 @@ class BZRC {
 	int LineFeedPos;
 	int Start;
 	int sd;
+	//constants
+	int attractionSpread;
+	int attractionConst;
+	int replusionSpread;
+	int replusionConst;
 
 	// Initializing connection.
 	int Init() {
@@ -296,6 +302,12 @@ public:
 		else {
 			InitStatus=true;
 		}
+
+		//constants 
+		attractionSpread = 100;
+		attractionConst = 10;
+		replusionSpread = 50;
+		replusionConst = 10;
 	}
 
 	// Self check
@@ -610,10 +622,59 @@ public:
 		return true;
 	}
 
+	double distance_from_tank_to_point(int index, double point[]){
+		vector<tank_t> my_tanks;
+		get_mytanks(&my_tanks);
+		return sqrt( pow(my_tanks[index].pos[0] - point[0], 2) + 
+			pow(my_tanks[index].pos[1] - point[1], 2) );	
+	}
+
+	double angle_from_tank_to_point(int index, double point[]){
+		vector<tank_t> my_tanks;
+		get_mytanks(&my_tanks);
+		return atan2( pow(my_tanks[index].pos[1] - point[1], 2),
+			 pow(my_tanks[index].pos[0] - point[0], 2) );	
+	}
+
+	void calcuate_attraction(int index, double goal[], double attraction[]){
+		double distance = distance_from_tank_to_point(index, goal);
+		double angle = angle_from_tank_to_point(index, goal);
+		if (distance <= 0){
+			attraction[0] = attraction[1] = 0;
+		}
+		else if (distance > attractionSpread){
+			double coefficent = attractionConst * attractionSpread;
+			attraction[0] = coefficent * cos(angle);
+			attraction[1] = coefficent * sin(angle);
+		}
+		else {
+			double coefficent = attractionConst * distance;
+			attraction[0] = coefficent * cos(angle);
+			attraction[1] = coefficent * sin(angle);
+		}
+	}
+
+	void calcuate_repulsion(int index, double object[], double radius, double repulsion[]){
+		double distance = distance_from_tank_to_point(index, object);
+		double angle = angle_from_tank_to_point(index, object);
+		if (distance < radius){
+			cerr << "tank " << index << " came inside obstacle" << endl;
+		}
+		else if (distance > replusionSpread + radius){
+			repulsion[0] = repulsion[1] = 0;
+		}
+		else {
+			double coefficent = replusionConst * (replusionSpread + radius - distance);
+			repulsion[0] = coefficent * cos(angle);
+			repulsion[1] = coefficent * sin(angle);
+		}
+	}
+
 	int Close() {
 		close(sd);
 		return 0;
-	}
+	}		
+		
 
 };
 
