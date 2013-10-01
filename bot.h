@@ -9,7 +9,8 @@
 #include <unistd.h>
 #include <vector>
 #include <cmath>
-#include "math.h"
+#include "velocityPDController.h"
+#include "anglePDController.h"
 
 using namespace std;
 
@@ -102,6 +103,11 @@ class BZRC {
 	int replusionSpread;
 	double replusionConst;
 	double goal[2];
+	vector<AnglePDController*> angleControllers;
+	vector<VelocityPDController*> velocityControllers;
+	vector<double> latestVelocity;
+	vector<double> latestAngVel;
+
 
 	// Initializing connection.
 	int Init() {
@@ -310,6 +316,24 @@ public:
 		attractionConst = 0.2;
 		replusionSpread = 50;
 		replusionConst = 10;
+
+		//create tank controllers
+		vector<tank_t> myTanks;
+		for (int i = 0; i < myTanks.size(); ++i){
+			angleControllers.push_back(new AnglePDController());
+			velocityControllers.push_back(new VelocityPDController());
+			latestVelocity.push_back(0);
+			latestAngVel.push_back(0);
+		}
+	}
+
+	~BZRC(){
+		for (int i = 0; i < angleControllers.size(); ++i){
+			delete angleControllers[i];
+		}
+		for (int i = 0; i < velocityControllers.size(); ++i){
+			delete velocityControllers[i];
+		}
 	}
 
 	// Self check
@@ -346,6 +370,7 @@ public:
 		SendLine(Command);
 		ReadAck();
 		if(ReadBool()) {
+			latestVelocity[index] = value;
 			return true;
 		}
 		else {
@@ -530,7 +555,7 @@ public:
 		return true;
 	}
 
-	bool get_mytanks(vector <tank_t> *AllMyTanks) {
+	bool get_mytanks(vector <tank_t> &AllMyTanks) {
 		// Request a list of our robots.
 		SendLine("mytanks");
 		ReadAck();
@@ -555,7 +580,7 @@ public:
 			MyTank.velocity[0]=atof(v.at(10).c_str());
 			MyTank.velocity[1]=atof(v.at(11).c_str());
 			MyTank.angvel=atof(v.at(12).c_str());
-			AllMyTanks->push_back(MyTank);
+			AllMyTanks.push_back(MyTank);
 			v.clear();
 			v=ReadArr();
 			i++;
@@ -642,8 +667,6 @@ public:
 	void calculate_attraction(double currentLocation[], double attraction[]){
 		double distance = distance_from_tank_to_point(currentLocation, goal);
 		double angle = angle_from_tank_to_point(currentLocation, goal);
-		// double pi = atan(1)*4;
-		// cout << angle*180/pi << endl;
 		if (distance <= 0){
 			attraction[0] = attraction[1] = 0;
 		}
@@ -659,7 +682,7 @@ public:
 		}
 	}
 
-	void calcuate_repulsion(double currentLocation[], double object[], double radius, double repulsion[]){
+	void calculate_repulsion_for_object(double currentLocation[], double object[], double radius, double repulsion[]){
 		double distance = distance_from_tank_to_point(currentLocation, object);
 		double angle = angle_from_tank_to_point(currentLocation, object);
 		if (distance < radius){
@@ -674,12 +697,64 @@ public:
 			repulsion[1] = coefficent * sin(angle);
 		}
 	}
+
+	void calculate_repulsion(double currentLocation[], double repulsion[]){
+		vector<obstacle_t> obstacles;
+		get_obstacles(obstacles);
+		for (int i = 0; i < obstacles.size(); ++i){
+			//calculate replusion
+		}
+	}
 	
 	int Close() {
 		close(sd);
 		return 0;
+	}	
+
+	tank_t get_tank(int index){
+		vector<tank_t> myTanks;
+		get_mytanks(myTanks);
+		return myTanks[index];
+	}
+
+	void add_values(double a[], double b[], double result[]){
+		result[0] = a[0] + b[0];
+		result[1] = a[1] + b[1];
+	}
+
+	void calculate_potential_field(int index, double pf[]){
+		tank_t tank = get_tank(index);
+		double attraction[2];
+		calculate_attraction(tank.pos, attraction);
+		double repulsion[2];
+		calculate_repulsion(tank.pos, repulsion);
+		add_values(attraction, repulsion, pf);
 	}		
-		
+
+	double calculate_angvel(int index, double target[]){
+		double angle = atan2(target[1], target[0]);
+		/*int d = Math.abs(a - b) % 360;
+    	int r = d > 180 ? 360 - d : d;*/
+    	return 0;
+	} 	
+
+	double calculate_speed(double pf[]){
+		return 0;
+	} 
+	
+	void pf_move(int index){
+		//calculate potential field
+		double pf[2];
+		calculate_potential_field(index, pf);
+		double target[2];
+		tank_t tank = get_tank(index);
+		add_values(pf, tank.pos, target);
+		// calculate angular velocity and velocity
+		double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, target));
+		angvel(index, angularvel);
+		double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(target));
+		speed(index, velocity);
+	}
 
 };
 
