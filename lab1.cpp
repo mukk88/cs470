@@ -79,6 +79,14 @@ int main(int argc, char *argv[]) {
 		mainPrint(obs, myTeam);
 	}
 	
+	obstacle_t ob;
+	ob.o_corner[0][0] = 0;
+	ob.o_corner[0][1] = 100;
+	ob.o_corner[1][0] = 100;
+	ob.o_corner[1][1] = 0;
+
+	double curLoc[2] = {100, 100};
+	cout << myTeam.closestPoint(curLoc, ob) << endl;
 
 
 	int botnum = 8;

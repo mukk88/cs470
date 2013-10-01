@@ -649,7 +649,7 @@ public:
 		return true;
 	}
 
-	double distance_from_tank_to_point(double currentLocation[], double object[]){
+	double distancePoints(double currentLocation[], double object[]){
 		return sqrt( pow(currentLocation[0] - object[0], 2) + 
 			pow(currentLocation[1] - object[1], 2) );	
 	}
@@ -665,7 +665,7 @@ public:
 	}
 
 	void calculate_attraction(double currentLocation[], double attraction[]){
-		double distance = distance_from_tank_to_point(currentLocation, goal);
+		double distance = distancePoints(currentLocation, goal);
 		double angle = angle_from_tank_to_point(currentLocation, goal);
 		if (distance <= 0){
 			attraction[0] = attraction[1] = 0;
@@ -682,8 +682,14 @@ public:
 		}
 	}
 
+<<<<<<< Updated upstream
 	void calculate_repulsion_for_object(double currentLocation[], double object[], double radius, double repulsion[]){
 		double distance = distance_from_tank_to_point(currentLocation, object);
+=======
+
+	void calcuate_repulsion(double currentLocation[], double object[], double radius, double repulsion[]){
+		double distance = distancePoints(currentLocation, object);
+>>>>>>> Stashed changes
 		double angle = angle_from_tank_to_point(currentLocation, object);
 		if (distance < radius){
 			cerr << "x value " << currentLocation[0] << " came inside obstacle" << endl;
@@ -698,6 +704,7 @@ public:
 		}
 	}
 
+<<<<<<< Updated upstream
 	void calculate_repulsion(double currentLocation[], double repulsion[]){
 		vector<obstacle_t> obstacles;
 		get_obstacles(obstacles);
@@ -705,6 +712,46 @@ public:
 			//calculate replusion
 		}
 	}
+=======
+	void closestPoint(double currentLocation[], obstacle_t obs, double closest[]){
+		double distance;
+		for(int i=0;i<4;i++){
+			double startX = obs.o_corner[i+0][0];
+			double startY = obs.o_corner[i+0][1];
+			double endX = obs.o_corner[(i+1)%4][0];
+			double endY = obs.o_corner[(i+1)%4][1];
+			double diffX = endX - startX;
+			double diffY = endY - startY;
+			double perpenX = -diffY;
+			double perpenY = diffX;
+			normalize(perpenX, perpenY);
+			double rX = startX - currentLocation[0];
+			double rY = startY - currentLocation[1];
+			double newdist = abs(dot(rX, rY, perpenX, perpenY));
+			if(newdist<distance){
+				//set points
+				closest[0] = currentLocation[0] + perpenX*newdist;
+				closest[1] = currentLocation[1] + perpenY*newdist;	
+				distance = newdist;
+			}
+		}
+	}
+
+	void normalize(double &x, double &y){
+		double distance = pow(pow(x,2) + pow(y,2),0.5);
+		if(distance!=0){
+			x = x/distance;
+			y = y/distance;
+		}else{
+			x = 0;
+			y = 0;
+		}
+	}
+
+	double dot(double x1, double y1, double x2, double y2){
+		return x1*x2 + y1*y2;
+	}
+>>>>>>> Stashed changes
 	
 	int Close() {
 		close(sd);
