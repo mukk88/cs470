@@ -43,20 +43,23 @@ void printObstacleData(vector<obstacle_t>& obstacles, ofstream & outfile) {
   }
 }
 
-void printPotentials(ofstream& outfile){
+void printPotentials(ofstream& outfile, BZRC& myTeam){
 	for(int i=-390;i<400;i+=20){
 		for(int j=-390;j<400;j+=20){
 			Node start, end;
 			start.x = i;
 			start.y = j;
-			end.x = i+5;
-			end.y = j+5;
+			double curLoc[2] = {i,j};
+			double deltas[2];
+			myTeam.calculate_attraction(curLoc, deltas);
+			end.x = -deltas[0] + i;
+			end.y = -deltas[1] + j;
 			printLine(start, end,outfile);
 		}
 	}
 }
 
-void mainPrint(vector<obstacle_t>& obstacles){
+void mainPrint(vector<obstacle_t>& obstacles, BZRC& myTeam){
 	ofstream outfile;
 	outfile.open("plot2.gpi");
 	outfile << "set title \"My Title\"" << endl;
@@ -73,7 +76,14 @@ void mainPrint(vector<obstacle_t>& obstacles){
 	end.x = 200;
 	end.y = 200;
 	// printLine(start, end, outfile);
-	printPotentials(outfile);
+	printPotentials(outfile, myTeam);
+
+	// double x, y, result;
+	// double pi = atan(1)*4;
+	// x = -10.0;
+	// y = 10.0;
+	// result = atan2 (y,x) * 180 / pi;
+	// printf ("The arc tangent for (x=%f, y=%f) is %f degrees\n", x, y, result );
 
 	outfile << "plot \'-\' with lines\n";
 	outfile << "0 0 0 0\ne\n";
