@@ -75,7 +75,8 @@ int main(int argc, char *argv[]) {
 	vector<obstacle_t> obs;
 	bool result = myTeam.get_obstacles(obs);
 	if(result){
-		mainPrint(obs);
+		myTeam.setGoal(300,300);
+		mainPrint(obs, myTeam);
 	}
 	
 

@@ -98,9 +98,10 @@ class BZRC {
 	int sd;
 	//constants
 	int attractionSpread;
-	int attractionConst;
+	double attractionConst;
 	int replusionSpread;
-	int replusionConst;
+	double replusionConst;
+	double goal[2];
 
 	// Initializing connection.
 	int Init() {
@@ -306,7 +307,7 @@ public:
 
 		//constants 
 		attractionSpread = 100;
-		attractionConst = 10;
+		attractionConst = 0.2;
 		replusionSpread = 50;
 		replusionConst = 10;
 	}
@@ -623,19 +624,26 @@ public:
 		return true;
 	}
 
-	double distance_potential_field(double currentLocation[], double object[]){
+	double distance_from_tank_to_point(double currentLocation[], double object[]){
 		return sqrt( pow(currentLocation[0] - object[0], 2) + 
-			pow(currentLocation.pos[1] - object[1], 2) );	
+			pow(currentLocation[1] - object[1], 2) );	
 	}
 
-	double angle_potential_field(double currentLocation[], double object[]){
-		return atan2( pow(currentLocation[1] - object[1], 2),
-			 pow(currentLocation[0] - object[0], 2) );	
+	double angle_from_tank_to_point(double currentLocation[], double object[]){
+		return atan2( currentLocation[1] - object[1],
+			 currentLocation[0] - object[0] );	
 	}
 
-	void calcuate_attraction(int index, double goal[], double attraction[]){
-		double distance = distance_from_tank_to_point(index, goal);
-		double angle = angle_from_tank_to_point(index, goal);
+	void setGoal(double x, double y){
+		goal[0] = x;
+		goal[1] = y;
+	}
+
+	void calculate_attraction(double currentLocation[], double attraction[]){
+		double distance = distance_from_tank_to_point(currentLocation, goal);
+		double angle = angle_from_tank_to_point(currentLocation, goal);
+		// double pi = atan(1)*4;
+		// cout << angle*180/pi << endl;
 		if (distance <= 0){
 			attraction[0] = attraction[1] = 0;
 		}
@@ -651,11 +659,11 @@ public:
 		}
 	}
 
-	void calcuate_repulsion(int index, double object[], double radius, double repulsion[]){
-		double distance = distance_from_tank_to_point(index, object);
-		double angle = angle_from_tank_to_point(index, object);
+	void calcuate_repulsion(double currentLocation[], double object[], double radius, double repulsion[]){
+		double distance = distance_from_tank_to_point(currentLocation, object);
+		double angle = angle_from_tank_to_point(currentLocation, object);
 		if (distance < radius){
-			cerr << "tank " << index << " came inside obstacle" << endl;
+			cerr << "x value " << currentLocation[0] << " came inside obstacle" << endl;
 		}
 		else if (distance > replusionSpread + radius){
 			repulsion[0] = repulsion[1] = 0;
