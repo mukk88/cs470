@@ -681,7 +681,4 @@ void world_init(BZRC *my_team);
 void robot_pre_update();
 void robot_update();
 void robot_post_update();
-<<<<<<< Updated upstream
-=======
 
->>>>>>> Stashed changes
