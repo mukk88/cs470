@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <unistd.h>
 #include <vector>
 #include <cmath>
 #include "math.h"
@@ -442,7 +443,7 @@ public:
 		return true;
 	}
 
-	bool get_obstacles(vector <obstacle_t> *AllObstacles) {
+	bool get_obstacles(vector <obstacle_t>& AllObstacles) {
 		// Request a list of obstacles.
 		SendLine("obstacles");
 		ReadAck();
@@ -461,7 +462,7 @@ public:
 				MyObstacle.o_corner[j/2][1]=atof(v.at(j+2).c_str());
 				j=j+2;
 			}
-			AllObstacles->push_back(MyObstacle);
+			AllObstacles.push_back(MyObstacle);
 			v.clear();
 			v=ReadArr();
 			i++;
@@ -680,3 +681,7 @@ void world_init(BZRC *my_team);
 void robot_pre_update();
 void robot_update();
 void robot_post_update();
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
