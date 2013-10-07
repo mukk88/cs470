@@ -43,6 +43,12 @@ void dumbAgents(vector<int> numbots, BZRC& myTeam){
 	}
 }
 
+void pfAgents(vector<int> numbots, BZRC& myTeam){
+	for(int i=0;i<numbots.size();i++){
+		myTeam.pf_move(numbots[i]);
+		sleep(1);
+	}
+}
 
 int main(int argc, char *argv[]) {
 	const char *pcHost = "127.0.0.1";
@@ -86,7 +92,7 @@ int main(int argc, char *argv[]) {
 	ob.o_corner[1][1] = 0;
 
 	double curLoc[2] = {100, 100};
-	cout << myTeam.closestPoint(curLoc, ob) << endl;
+	//cout << myTeam.closestPoint(curLoc, ob) << endl;
 
 
 	int botnum = 8;
@@ -96,7 +102,7 @@ int main(int argc, char *argv[]) {
 	botnums.push_back(2);
 	botnums.push_back(6);
 	while(true){
-		dumbAgents(botnums, myTeam);
+		pfAgents(botnums, myTeam);
 	}
 	
 

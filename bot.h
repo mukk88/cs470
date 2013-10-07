@@ -1,7 +1,10 @@
+#define _USE_MATH_DEFINES
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string>
+#include <set>
+#include <map>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -74,12 +77,14 @@ public:
 		MyVector.begin();
 	}
 
-	vector <string> Split() {
+	vector <string> Split(bool skipBlanks = false) {
 		MyVector.clear();
 		size_t LastLoc = -1;
 		size_t CurLoc = MyString.find(" ", 0);
 		while (CurLoc != string::npos) {
-			MyVector.push_back(MyString.substr(LastLoc+1, CurLoc-LastLoc-1));
+			string curValue = MyString.substr(LastLoc+1, CurLoc-LastLoc-1);
+			if (!skipBlanks || curValue.compare("") != 0)
+				MyVector.push_back(curValue);
 			LastLoc=CurLoc;
 			CurLoc = MyString.find(" ", LastLoc+1);
 		}
@@ -107,6 +112,10 @@ class BZRC {
 	vector<VelocityPDController*> velocityControllers;
 	vector<double> latestVelocity;
 	vector<double> latestAngVel;
+	string color;
+	double home[2];
+	map<int, string> goalMapping;
+	string HOME;
 
 
 	// Initializing connection.
@@ -253,7 +262,7 @@ class BZRC {
 	}
 
 	// Read line into vector
-	vector <string> ReadArr() {
+	vector <string> ReadArr(bool skipBlanks = false) {
 		char str[kBufferSize];
 		char *LineText=str;
 		ReadLine(LineText);
@@ -265,7 +274,7 @@ class BZRC {
 			if(debug) cout << LineText << endl;
 		}
 		SplitString ss=SplitString(LineText);
-		return ss.Split();
+		return ss.Split(skipBlanks);
 	}
 	// Read Acknowledgement
 	void ReadAck() {
@@ -317,14 +326,24 @@ public:
 		replusionSpread = 50;
 		replusionConst = 10;
 
+		set_home_location();
+		set<string> enemy_colors;
+		enemy_colors.insert("green");
+		enemy_colors.insert("blue");
+		enemy_colors.insert("purple");
+		enemy_colors.insert("red");
+		enemy_colors.erase(enemy_colors.find(color));
 		//create tank controllers
 		vector<tank_t> myTanks;
+		get_mytanks(myTanks);
 		for (int i = 0; i < myTanks.size(); ++i){
 			angleControllers.push_back(new AnglePDController());
 			velocityControllers.push_back(new VelocityPDController());
 			latestVelocity.push_back(0);
 			latestAngVel.push_back(0);
+			goalMapping.insert( pair<int, string>(i, *(enemy_colors.begin())) );			
 		}
+		HOME = "home";
 	}
 
 	~BZRC(){
@@ -527,6 +546,74 @@ public:
 		return true;
 	}
 
+	bool set_home_location() {	
+		set<string> colors;
+		colors.insert("blue");
+		colors.insert("purple");
+		colors.insert("green");
+		colors.insert("red");
+		// Request a list of tanks that aren't our robots.
+		SendLine("othertanks");
+		ReadAck();
+		vector <string> v=ReadArr();
+		if(v.at(0)!="begin") {
+			return false;
+		}
+		v.clear();
+		v=ReadArr();
+		int i=0;
+		while(v.at(0)=="othertank") {	
+			if (colors.find( v.at(2) ) != colors.end())	
+			{	
+	  			colors.erase( colors.find( v.at(2) ) );
+	  		}
+			// v.clear();
+			vector<string> temp;
+			v = temp;
+			v=ReadArr();
+			++i;
+		}
+		if(v.at(0)!="end") {
+			return false;
+		}
+		for (set<string>::iterator it=colors.begin(); it!=colors.end(); ++it){
+    		color = *it;
+    		break;
+    	}
+
+		return get_flag_location(color, home);
+	}
+
+	bool get_flag_location(string desired_color, double home[]){
+		// Request a list of flags.
+		SendLine("flags");
+		ReadAck();
+		vector <string> v=ReadArr();
+		if(v.at(0)!="begin") {
+			return false;
+		}
+		v.clear();
+		v=ReadArr();		
+		int i=0;
+		while(v.at(0)=="flag") {
+			if (v.at(1).compare(desired_color) == 0){
+				home[0]=atof(v.at(3).c_str());
+				home[1]=atof(v.at(4).c_str());
+				break;
+			}
+			v.clear();
+			v=ReadArr();
+			++i;
+		}
+
+		while (v.at(0)!="end") {
+			v.clear();
+			v=ReadArr();
+			++i;
+		}
+		return false;
+	}
+
 	bool get_shots(vector <shot_t> *AllShots) {
 		// Request a list of shots.
 		SendLine("shots");
@@ -564,7 +651,7 @@ public:
 			return false;
 		}
 		v.clear();
-		v=ReadArr();
+		v=ReadArr(true);
 		int i=0;
 		while(v.at(0)=="mytank") {
 			tank_t MyTank;
@@ -582,7 +669,7 @@ public:
 			MyTank.angvel=atof(v.at(12).c_str());
 			AllMyTanks.push_back(MyTank);
 			v.clear();
-			v=ReadArr();
+			v=ReadArr(true);
 			i++;
 		}
 		if(v.at(0)!="end") {
@@ -664,6 +751,19 @@ public:
 		goal[1] = y;
 	}
 
+	void setGoal(int index){
+		string goalName = goalMapping[index];
+		if (goalName.compare(HOME) == 0)
+		{
+			goal[0] = home[0];
+			goal[1] = home[1];
+		}
+		else
+		{
+			get_flag_location(goalName, goal);
+		}
+	}
+
 	void calculate_attraction(double currentLocation[], double attraction[]){
 		double distance = distancePoints(currentLocation, goal);
 		double angle = angle_from_tank_to_point(currentLocation, goal);
@@ -705,6 +805,7 @@ public:
 		for (int i = 0; i < obstacles.size(); ++i){
 			//calculate replusion
 		}
+		repulsion[0] = repulsion[1] = 0;
 	}
 
 	void closestPoint(double currentLocation[], obstacle_t obs, double closest[]){
@@ -762,40 +863,53 @@ public:
 		result[1] = a[1] + b[1];
 	}
 
-	void calculate_potential_field(int index, double pf[]){
+	bool calculate_potential_field(int index, double pf[]){
 		tank_t tank = get_tank(index);
 		double attraction[2];
 		calculate_attraction(tank.pos, attraction);
+		if (attraction[0] == 0 && attraction[1] == 0)
+			return true;
+
 		double repulsion[2];
 		calculate_repulsion(tank.pos, repulsion);
 		add_values(attraction, repulsion, pf);
+		return false;
 	}		
 
 	double calculate_angvel(int index, double target[]){
+		tank_t tank = get_tank(index);
 		double angle = atan2(target[1], target[0]);
-		/*int d = Math.abs(a - b) % 360;
-    	int r = d > 180 ? 360 - d : d;*/
-    	return 0;
+		double d = fmod( abs(angle - tank.angle), 2 * M_PI );
+    	double angleDiff = d > M_PI ? (2 * M_PI) - d : d;
+    	return angleDiff / M_PI; // maximum angvel is 1
 	} 	
 
 	double calculate_speed(double pf[]){
-		return 0;
+		double distance = sqrt( pow(pf[0], 2) + pow(pf[1], 2) );
+		double speed = distance / 100;
+		return fmin(speed, 1); // maximum speed is 1
 	} 
 	
 	void pf_move(int index){
 		//calculate potential field
 		double pf[2];
-		calculate_potential_field(index, pf);
+		bool mission_accomplished = calculate_potential_field(index, pf);
+		if (mission_accomplished)
+		{
+			goalMapping[index] = HOME;
+		}
+		setGoal(index);
 		double target[2];
 		tank_t tank = get_tank(index);
 		add_values(pf, tank.pos, target);
 		// calculate angular velocity and velocity
-		double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, target));
+		//double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, target));
+		double angularvel = calculate_angvel(index, target);
 		angvel(index, angularvel);
-		double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(target));
+		//double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(target));
+		double velocity = calculate_speed(target);
 		speed(index, velocity);
 	}
-
 };
 
 // Prototypes
@@ -804,4 +918,3 @@ void world_init(BZRC *my_team);
 void robot_pre_update();
 void robot_update();
 void robot_post_update();
-
