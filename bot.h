@@ -20,6 +20,11 @@ using namespace std;
 #define MAX_OBSTACLE_CORNERS 10
 const int kBufferSize = 1024;
 
+struct Node{
+	double x;
+	double y;
+};
+
 typedef struct team_t {
 	string color;
 	int count;
@@ -324,7 +329,7 @@ public:
 		attractionSpread = 100;
 		attractionConst = 0.2;
 		replusionSpread = 50;
-		replusionConst = 10;
+		replusionConst = -0.8;
 
 		set_home_location();
 		set<string> enemy_colors;
@@ -783,9 +788,10 @@ public:
 	}
 
 
-	void calculate_repulsion_for_object(double currentLocation[], double object[], double radius, double repulsion[]){
+	Node calculate_repulsion_for_object(double currentLocation[], double object[], double radius){
 		double distance = distancePoints(currentLocation, object);
 		double angle = angle_from_tank_to_point(currentLocation, object);
+		double repulsion[2];
 		if (distance < radius){
 			cerr << "x value " << currentLocation[0] << " came inside obstacle" << endl;
 		}
@@ -797,16 +803,71 @@ public:
 			repulsion[0] = coefficent * cos(angle);
 			repulsion[1] = coefficent * sin(angle);
 		}
+		Node result;
+		result.x = repulsion[0];
+		result.y = repulsion[1];
 	}
 
-	void calculate_repulsion(double currentLocation[], double repulsion[]){
+	void calculate_repulsion(Node repulsion[40][40]){
 		vector<obstacle_t> obstacles;
 		get_obstacles(obstacles);
+		for(int i=0;i<40;i++){
+			for(int j=0;j<40;j++){
+				repulsion[i][j].x = 0;
+				repulsion[i][j].y = 0;
+			}
+		}
+		double sum[2] = {0,0};
 		for (int i = 0; i < obstacles.size(); ++i){
-			//calculate replusion
+			createRepulsion(repulsion, obstacles[i]);
+		}
+	}
+
+	void createRepulsion(Node repulsion[40][40], obstacle_t obs){
+		Node start, end, perp;
+		start.x = obs.o_corner[0][0] + 400;
+		start.y = obs.o_corner[0][1] + 400;
+		end.x = obs.o_corner[1][0] + 400;
+		end.y = obs.o_corner[1][1] + 400;
+		perp = perpen(start, end);
+		norm(perp);
+		while(start.y >= end.y){
+			// cout << start.x << " " << end.x << endl;
+			int yindex = start.y/20;
+			int xindex = start.x/20;  
+			repulsion[yindex][xindex+1].x = 10 * perp.x;
+			repulsion[yindex][xindex+1].y = 10 * perp.y;
+			repulsion[yindex][xindex+2].x = 5 * perp.x;
+			repulsion[yindex][xindex+2].y = 5 * perp.y; 
+			repulsion[yindex][xindex+3].x = 2 * perp.x;
+			repulsion[yindex][xindex+3].y = 2 * perp.y;    
+			start.y -= 20;
+		}	
+	}
+
+	Node perpen(Node start, Node end){
+		Node result;
+		// result.x = end.x - start.x;
+		// result.y = - end.y + start.y;
+		result.x = -end.y + start.y;
+		result.y = end.x - start.x;
+		return result;
+	}
+
+	void norm(Node& start){
+		double x = start.x;
+		double y = start.y;
+		double distance = pow(pow(x,2) + pow(y,2),0.5);
+		if(distance!=0){
+			start.x = x/distance;
+			start.y = y/distance;
+		}else{
+			start.x = 0;
+			start.y = 0;
 		}
 		repulsion[0] = repulsion[1] = 0;
 	}
+
 
 	void closestPoint(double currentLocation[], obstacle_t obs, double closest[]){
 		double distance;
@@ -822,11 +883,23 @@ public:
 			normalize(perpenX, perpenY);
 			double rX = startX - currentLocation[0];
 			double rY = startY - currentLocation[1];
-			double newdist = abs(dot(rX, rY, perpenX, perpenY));
-			if(newdist<distance){
+			double sign = dot(rX, rY, perpenX, perpenY);
+			bool pos;
+			if(sign>0){
+				pos = true;
+			}else{
+				pos = false;
+			}
+			double newdist = abs(sign);
+			if(newdist<distance && newdist < 50){
 				//set points
-				closest[0] = currentLocation[0] + perpenX*newdist;
-				closest[1] = currentLocation[1] + perpenY*newdist;	
+				if(pos){
+					closest[0] = currentLocation[0] - perpenX*newdist;
+					closest[1] = currentLocation[1] - perpenY*newdist;	
+				}else{
+					closest[0] = currentLocation[0] + perpenX*newdist;
+					closest[1] = currentLocation[1] + perpenY*newdist;	
+				}
 				distance = newdist;
 			}
 		}
@@ -871,7 +944,7 @@ public:
 			return true;
 
 		double repulsion[2];
-		calculate_repulsion(tank.pos, repulsion);
+		// calculate_repulsion(tank.pos, repulsion);
 		add_values(attraction, repulsion, pf);
 		return false;
 	}		
