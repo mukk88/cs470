@@ -92,12 +92,9 @@ int main(int argc, char *argv[]) {
 	ob.o_corner[1][1] = 0;
 
 	double curLoc[2] = {100, 100};
-<<<<<<< Updated upstream
-	//cout << myTeam.closestPoint(curLoc, ob) << endl;
-=======
+
 	double nearest[2];
 	myTeam.closestPoint(curLoc, ob, nearest);
->>>>>>> Stashed changes
 
 
 	int botnum = 8;
