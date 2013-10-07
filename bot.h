@@ -865,7 +865,7 @@ public:
 			start.x = 0;
 			start.y = 0;
 		}
-		repulsion[0] = repulsion[1] = 0;
+		// repulsion[0] = repulsion[1] = 0;
 	}
 
 
