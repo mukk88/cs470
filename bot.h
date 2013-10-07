@@ -327,7 +327,7 @@ public:
 
 		//constants 
 		attractionSpread = 100;
-		attractionConst = 0.2;
+		attractionConst = -0.2;
 		replusionSpread = 50;
 		replusionConst = -0.8;
 
@@ -952,9 +952,8 @@ public:
 	double calculate_angvel(int index, double target[]){
 		tank_t tank = get_tank(index);
 		double angle = atan2(target[1], target[0]);
-		double d = fmod( abs(angle - tank.angle), 2 * M_PI );
-    	double angleDiff = d > M_PI ? (2 * M_PI) - d : d;
-    	return angleDiff / M_PI; // maximum angvel is 1
+		double d = fmod( angle - tank.angle, M_PI );
+    	return d / (M_PI * 2); // maximum angvel is .5
 	} 	
 
 	double calculate_speed(double pf[]){
