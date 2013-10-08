@@ -19,6 +19,7 @@ using namespace std;
 
 #define MAX_OBSTACLE_CORNERS 10
 const int kBufferSize = 1024;
+#define repulseDistance 50
 
 struct Node{
 	double x;
@@ -808,116 +809,102 @@ public:
 		result.y = repulsion[1];
 	}
 
-	void calculate_repulsion(Node repulsion[40][40]){
+	void calculate_repulsion(Node repulsion[400][400]){
 		vector<obstacle_t> obstacles;
 		get_obstacles(obstacles);
-		for(int i=0;i<40;i++){
-			for(int j=0;j<40;j++){
+		for(int i=0;i<400;i++){
+			for(int j=0;j<400;j++){
 				repulsion[i][j].x = 0;
 				repulsion[i][j].y = 0;
 			}
 		}
-		double sum[2] = {0,0};
 		for (int i = 0; i < obstacles.size(); ++i){
 			createRepulsion(repulsion, obstacles[i]);
 		}
 	}
 
-	void createRepulsion(Node repulsion[40][40], obstacle_t obs){
-		Node start, end, perp;
-		start.x = obs.o_corner[0][0] + 400;
-		start.y = obs.o_corner[0][1] + 400;
-		end.x = obs.o_corner[1][0] + 400;
-		end.y = obs.o_corner[1][1] + 400;
-		perp = perpen(start, end);
-		norm(perp);
-		while(start.y >= end.y){
-			// cout << start.x << " " << end.x << endl;
-			int yindex = start.y/20;
-			int xindex = start.x/20;  
-			repulsion[yindex][xindex+1].x = 10 * perp.x;
-			repulsion[yindex][xindex+1].y = 10 * perp.y;
-			repulsion[yindex][xindex+2].x = 5 * perp.x;
-			repulsion[yindex][xindex+2].y = 5 * perp.y; 
-			repulsion[yindex][xindex+3].x = 2 * perp.x;
-			repulsion[yindex][xindex+3].y = 2 * perp.y;    
-			start.y -= 20;
-		}	
+
+	void createRepulsion(Node repulsion[400][400], obstacle_t obs){
+		//walk along the sides and create a list of points
+		vector<Node> points;
+		Node start, end, step;
+		for(int j= 0; j<4;j++){
+			start.x = obs.o_corner[0+j][0] + 400;
+			start.y = obs.o_corner[0+j][1] + 400;
+			end.x = obs.o_corner[(1+j)%4][0] + 400;
+			end.y = obs.o_corner[(1+j)%4][1] + 400;
+			step = stepResult(start,end);
+			points.push_back(start);
+			int steps = stepsNo(start,end);
+			for(int i=0;i<steps;i++){
+				start.x += step.x;
+				start.y += step.y;
+				points.push_back(start);
+			}			
+		}
+		//loop through all points for whole map
+		for(int j=0;j<800;j+=2){
+			for(int i=0;i<800;i+=2){
+				double scalar = 0.1;
+				Node node, dir;
+				double dirX = 0, dirY = 0;
+				for(int k=0;k<points.size();k++){
+					double mag = scalar * distancePoints(i,j,points[k]);
+					dir.x = i- points[k].x;
+					dir.y = j - points[k].y;
+					norm(dir);
+					dirX += dir.x*mag;
+					dirY += dir.y*mag;
+				}
+				repulsion[i/2][j/2].x += dirX;
+				repulsion[i/2][j/2].y +=dirY; 
+			}
+		}
 	}
 
-	Node perpen(Node start, Node end){
+	Node stepResult(Node start, Node end){
 		Node result;
-		// result.x = end.x - start.x;
-		// result.y = - end.y + start.y;
-		result.x = -end.y + start.y;
-		result.y = end.x - start.x;
+		int yDiff = end.y - start.y;
+		int xDiff = end.x - start.x;
+		int sum = abs(yDiff) + abs(xDiff);
+		if(!sum){
+			cerr << "error in points" << endl;
+			return result;
+		}
+		int xStep = xDiff/sum;
+		int yStep = yDiff/sum;
+		result.x = repulseDistance*xStep;
+		result.y = repulseDistance*yStep;
 		return result;
 	}
 
-	void norm(Node& start){
-		double x = start.x;
-		double y = start.y;
+	int stepsNo(Node start, Node end){
+		double dist = distancePoints(start, end);
+		return (int)(dist/repulseDistance);
+	}
+
+	double distancePoints(Node start, Node end){
+		return sqrt( pow(end.x - start.x, 2) + 
+			pow(end.y - start.y, 2) );	
+	}
+
+	double distancePoints(int startX, int startY, Node end){
+		double result =  sqrt( pow(end.x - startX, 2) + 
+			pow(end.y - startY, 2) );	
+		return result > repulseDistance ? 0 : result;
+	}
+
+	void norm(Node& node){
+		double x = node.x;
+		double y = node.y;
 		double distance = pow(pow(x,2) + pow(y,2),0.5);
 		if(distance!=0){
-			start.x = x/distance;
-			start.y = y/distance;
+			node.x = x/distance;
+			node.y = y/distance;
 		}else{
-			start.x = 0;
-			start.y = 0;
+			node.x = 0;
+			node.y = 0;
 		}
-		// repulsion[0] = repulsion[1] = 0;
-	}
-
-
-	void closestPoint(double currentLocation[], obstacle_t obs, double closest[]){
-		double distance;
-		for(int i=0;i<4;i++){
-			double startX = obs.o_corner[i+0][0];
-			double startY = obs.o_corner[i+0][1];
-			double endX = obs.o_corner[(i+1)%4][0];
-			double endY = obs.o_corner[(i+1)%4][1];
-			double diffX = endX - startX;
-			double diffY = endY - startY;
-			double perpenX = -diffY;
-			double perpenY = diffX;
-			normalize(perpenX, perpenY);
-			double rX = startX - currentLocation[0];
-			double rY = startY - currentLocation[1];
-			double sign = dot(rX, rY, perpenX, perpenY);
-			bool pos;
-			if(sign>0){
-				pos = true;
-			}else{
-				pos = false;
-			}
-			double newdist = abs(sign);
-			if(newdist<distance && newdist < 50){
-				//set points
-				if(pos){
-					closest[0] = currentLocation[0] - perpenX*newdist;
-					closest[1] = currentLocation[1] - perpenY*newdist;	
-				}else{
-					closest[0] = currentLocation[0] + perpenX*newdist;
-					closest[1] = currentLocation[1] + perpenY*newdist;	
-				}
-				distance = newdist;
-			}
-		}
-	}
-
-	void normalize(double &x, double &y){
-		double distance = pow(pow(x,2) + pow(y,2),0.5);
-		if(distance!=0){
-			x = x/distance;
-			y = y/distance;
-		}else{
-			x = 0;
-			y = 0;
-		}
-	}
-
-	double dot(double x1, double y1, double x2, double y2){
-		return x1*x2 + y1*y2;
 	}
 	
 	int Close() {

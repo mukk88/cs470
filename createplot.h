@@ -44,34 +44,33 @@ void printObstacleData(vector<obstacle_t>& obstacles, ofstream & outfile) {
 }
 
 void printPotentials(ofstream& outfile, BZRC& myTeam){
-	// Node repulsion[40][40];
-	// myTeam.calculate_repulsion(repulsion);
-	// for(int i=0;i<40;i++){
-	// 	for(int j=0;j<40;j++){
-	// 		Node start, end;
-	// 		start.x = j*20-400;
-	// 		start.y = i*20-400;
-	// 		end.x = start.x + repulsion[i][j].x;
-	// 		end.y = start.y + repulsion[i][j].y;
-	// 		printLine(start, end,outfile);
-	// 		// cout << repulsion[j][i].x << "," << repulsion[j][i].y << " ";
-	// 	}//cout << endl;
-	// }
-	for(int i=-390;i<400;i+=20){
-		for(int j=-390;j<400;j+=20){
+	Node repulsion[400][400];
+	myTeam.calculate_repulsion(repulsion);
+	for(int i=0;i<400;i+=10){
+		for(int j=0;j<400;j+=10){
 			Node start, end;
-			start.x = i;
-			start.y = j;
-			double curLoc[2] = {i,j};
-			double deltas[2];
-			// cout << deltas[1] << " " << deltas[2] << endl;
-			myTeam.calculate_attraction(curLoc, deltas);
-			end.x = -deltas[0] + i;
-			end.y = -deltas[1] + j;
-			// cout << end.x << " " << end.y << endl;
-			printLine(start, end,outfile);
+			start.x = i*2-400;
+			start.y = j*2-400;
+			end.x = start.x + repulsion[i][j].x;
+			end.y = start.y + repulsion[i][j].y;
+			printLine(start,end, outfile);
 		}
 	}
+	// for(int i=-390;i<400;i+=20){
+	// 	for(int j=-390;j<400;j+=20){
+	// 		Node start, end;
+	// 		start.x = i;
+	// 		start.y = j;
+	// 		double curLoc[2] = {i,j};
+	// 		double deltas[2];
+	// 		// cout << deltas[1] << " " << deltas[2] << endl;
+	// 		myTeam.calculate_attraction(curLoc, deltas);
+	// 		end.x = -deltas[0] + i;
+	// 		end.y = -deltas[1] + j;
+	// 		// cout << end.x << " " << end.y << endl;
+	// 		printLine(start, end,outfile);
+	// 	}
+	// }
 }
 
 void mainPrint(vector<obstacle_t>& obstacles, BZRC& myTeam){
@@ -90,15 +89,8 @@ void mainPrint(vector<obstacle_t>& obstacles, BZRC& myTeam){
 	start.y = 100;
 	end.x = 200;
 	end.y = 200;
-	// printLine(start, end, outfile);
-	printPotentials(outfile, myTeam);
 
-	// double x, y, result;
-	// double pi = atan(1)*4;
-	// x = -10.0;
-	// y = 10.0;
-	// result = atan2 (y,x) * 180 / pi;
-	// printf ("The arc tangent for (x=%f, y=%f) is %f degrees\n", x, y, result );
+	printPotentials(outfile, myTeam);
 
 	outfile << "plot \'-\' with lines\n";
 	outfile << "0 0 0 0\ne\n";
