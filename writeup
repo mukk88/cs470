@@ -1,0 +1,12 @@
+Attraction Fields
+	We picked an attraction field to guide the tanks to the opponents flags. The potential fields have both a strength and an angle. The strength of the attraction was proportionate to the distance to the goal. We also set a maximum strength to the potential field when the tank was too far away. The strength of the attraction approaches 0 as the point reaches the goal. To get the angle of the potential fields, we calulated the angle from each point to the goal. 
+
+Repulsion fields
+
+Tangential fields
+
+Tuning process
+
+Why we picked them
+What we did
+How we did it
