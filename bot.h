@@ -784,7 +784,7 @@ public:
 			attraction[1] = coefficent * sin(angle);
 		}
 		else {
-			double coefficent = attractionConst * distance;
+			double coefficent = attractionConst * fmax(distance,20);
 			attraction[0] = coefficent * cos(angle);
 			attraction[1] = coefficent * sin(angle);
 		}
