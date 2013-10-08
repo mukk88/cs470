@@ -45,7 +45,8 @@ void printObstacleData(vector<obstacle_t>& obstacles, ofstream & outfile) {
 
 void printPotentials(ofstream& outfile, BZRC& myTeam){
 	Node repulsion[400][400];
-	myTeam.calculate_repulsion(repulsion);
+	// myTeam.calculate_repulsion(repulsion);
+	myTeam.getRepulsion(repulsion);
 	for(int i=0;i<400;i+=10){
 		for(int j=0;j<400;j+=10){
 			Node start, end;
@@ -53,24 +54,14 @@ void printPotentials(ofstream& outfile, BZRC& myTeam){
 			start.y = j*2-400;
 			end.x = start.x + repulsion[i][j].x;
 			end.y = start.y + repulsion[i][j].y;
+			double curLoc[2] = {start.x, start.y};
+			double deltas[2];
+			myTeam.calculate_attraction(curLoc, deltas);
+			end.x += deltas[0];
+			end.y += deltas[1];
 			printLine(start,end, outfile);
 		}
 	}
-	// for(int i=-390;i<400;i+=20){
-	// 	for(int j=-390;j<400;j+=20){
-	// 		Node start, end;
-	// 		start.x = i;
-	// 		start.y = j;
-	// 		double curLoc[2] = {i,j};
-	// 		double deltas[2];
-	// 		// cout << deltas[1] << " " << deltas[2] << endl;
-	// 		myTeam.calculate_attraction(curLoc, deltas);
-	// 		end.x = -deltas[0] + i;
-	// 		end.y = -deltas[1] + j;
-	// 		// cout << end.x << " " << end.y << endl;
-	// 		printLine(start, end,outfile);
-	// 	}
-	// }
 }
 
 void mainPrint(vector<obstacle_t>& obstacles, BZRC& myTeam){

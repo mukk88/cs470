@@ -82,27 +82,21 @@ int main(int argc, char *argv[]) {
 	bool result = myTeam.get_obstacles(obs);
 	if(result){
 		myTeam.setGoal(300,300);
+		myTeam.calculate_repulsion();
 		mainPrint(obs, myTeam);
 	}
 	
-	obstacle_t ob;
-	ob.o_corner[0][0] = 0;
-	ob.o_corner[0][1] = 100;
-	ob.o_corner[1][0] = 100;
-	ob.o_corner[1][1] = 0;
-
-	double curLoc[2] = {100, 100};
-
-	double nearest[2];
-	myTeam.closestPoint(curLoc, ob, nearest);
-
-
 	int botnum = 8;
 	if(debugMode) cout << "calling agent code" << endl;
 
 	vector<int> botnums;
+	botnums.push_back(1);
 	botnums.push_back(2);
-	botnums.push_back(6);
+	botnums.push_back(3);
+	botnums.push_back(4);
+	botnums.push_back(5);
+
+	// botnums.push_back(4);
 	while(true){
 		pfAgents(botnums, myTeam);
 	}

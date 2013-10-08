@@ -122,7 +122,7 @@ class BZRC {
 	double home[2];
 	map<int, string> goalMapping;
 	string HOME;
-
+	Node repulseArray[400][400];
 
 	// Initializing connection.
 	int Init() {
@@ -788,43 +788,31 @@ public:
 		}
 	}
 
-
-	Node calculate_repulsion_for_object(double currentLocation[], double object[], double radius){
-		double distance = distancePoints(currentLocation, object);
-		double angle = angle_from_tank_to_point(currentLocation, object);
-		double repulsion[2];
-		if (distance < radius){
-			cerr << "x value " << currentLocation[0] << " came inside obstacle" << endl;
+	void getRepulsion(Node repulsion[400][400]){
+		for(int i=0;i<400;i++){
+			for(int j=0;j<400;j++){
+				repulsion[i][j].x = repulseArray[i][j].x;
+				repulsion[i][j].y = repulseArray[i][j].y;
+			}
 		}
-		else if (distance > replusionSpread + radius){
-			repulsion[0] = repulsion[1] = 0;
-		}
-		else {
-			double coefficent = replusionConst * (replusionSpread + radius - distance);
-			repulsion[0] = coefficent * cos(angle);
-			repulsion[1] = coefficent * sin(angle);
-		}
-		Node result;
-		result.x = repulsion[0];
-		result.y = repulsion[1];
 	}
 
-	void calculate_repulsion(Node repulsion[400][400]){
+
+	void calculate_repulsion(){
 		vector<obstacle_t> obstacles;
 		get_obstacles(obstacles);
 		for(int i=0;i<400;i++){
 			for(int j=0;j<400;j++){
-				repulsion[i][j].x = 0;
-				repulsion[i][j].y = 0;
+				repulseArray[i][j].x = 0;
+				repulseArray[i][j].y = 0;
 			}
 		}
 		for (int i = 0; i < obstacles.size(); ++i){
-			createRepulsion(repulsion, obstacles[i]);
+			createRepulsion(obstacles[i]);
 		}
 	}
 
-
-	void createRepulsion(Node repulsion[400][400], obstacle_t obs){
+	void createRepulsion(obstacle_t obs){
 		//walk along the sides and create a list of points
 		vector<Node> points;
 		Node start, end, step;
@@ -845,22 +833,35 @@ public:
 		//loop through all points for whole map
 		for(int j=0;j<800;j+=2){
 			for(int i=0;i<800;i+=2){
-				double scalar = 0.1;
-				Node node, dir;
+				double repulseScalar = 0.2;
+				double tanScalar = 0.3;
+				Node node, dir, tang;
 				double dirX = 0, dirY = 0;
 				for(int k=0;k<points.size();k++){
-					double mag = scalar * distancePoints(i,j,points[k]);
-					dir.x = i- points[k].x;
+					double repulseMag = repulseScalar * distancePoints(i,j,points[k]);
+					double tanMag = tanScalar * repulseMag/repulseScalar;
+					dir.x = i - points[k].x;
 					dir.y = j - points[k].y;
 					norm(dir);
-					dirX += dir.x*mag;
-					dirY += dir.y*mag;
+					dirX += dir.x*repulseMag;
+					dirY += dir.y*repulseMag;
+					tang = perpen(dir);
+					dirX += tang.x*tanMag;
+					dirY += tang.y*tanMag; 
 				}
-				repulsion[i/2][j/2].x += dirX;
-				repulsion[i/2][j/2].y +=dirY; 
+				repulseArray[i/2][j/2].x += dirX;
+				repulseArray[i/2][j/2].y +=dirY; 
 			}
 		}
 	}
+
+
+	Node perpen(Node node){
+		Node result;
+		result.x = node.y;
+		result.y = -node.x;
+		return result;
+	}		
 
 	Node stepResult(Node start, Node end){
 		Node result;
@@ -930,22 +931,29 @@ public:
 		if (attraction[0] == 0 && attraction[1] == 0)
 			return true;
 
-		double repulsion[2];
-		// calculate_repulsion(tank.pos, repulsion);
+		int tankX = (tank.pos[0] + 400)/2;
+		int tankY = (tank.pos[1] + 400)/2;
+
+		double repulsion[2] = {repulseArray[tankX][tankY].x,repulseArray[tankX][tankY].y};
 		add_values(attraction, repulsion, pf);
 		return false;
 	}		
 
+	double ratioed(double diff){
+		return diff/3.14*0.5;
+	}
+
 	double calculate_angvel(int index, double target[]){
 		tank_t tank = get_tank(index);
+		double tankAngle = fmod(tank.angle, M_PI*2);
 		double angle = atan2(target[1], target[0]);
-		double d = fmod( angle - tank.angle, M_PI );
-    	return d / (M_PI * 2); // maximum angvel is .5
+		double result = ratioed(angle - tankAngle);
+		return result; //max is 0.5
 	} 	
 
 	double calculate_speed(double pf[]){
 		double distance = sqrt( pow(pf[0], 2) + pow(pf[1], 2) );
-		double speed = distance / 100;
+		double speed = distance / 50;
 		return fmin(speed, 1); // maximum speed is 1
 	} 
 	
@@ -955,18 +963,23 @@ public:
 		bool mission_accomplished = calculate_potential_field(index, pf);
 		if (mission_accomplished)
 		{
-			goalMapping[index] = HOME;
+			speed(index, 0);
+			// goalMapping[index] = HOME;
+			return;
 		}
-		setGoal(index);
-		double target[2];
-		tank_t tank = get_tank(index);
-		add_values(pf, tank.pos, target);
+		// setGoal(index);
+		// double target[2] = {0,0};
+		// tank_t tank = get_tank(index);
+
+		// add_values(pf, tank.pos, target);
+
+
 		// calculate angular velocity and velocity
 		//double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, target));
-		double angularvel = calculate_angvel(index, target);
+		double angularvel = calculate_angvel(index, pf);
 		angvel(index, angularvel);
 		//double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(target));
-		double velocity = calculate_speed(target);
+		double velocity = calculate_speed(pf);
 		speed(index, velocity);
 	}
 };
