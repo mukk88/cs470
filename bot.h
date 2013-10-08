@@ -965,9 +965,12 @@ public:
 		
 		//calculate potential field
 		double pf[2];
-
+		bool flag;
 		bool mission_accomplished = calculate_potential_field(index, pf);
-		if (mission_accomplished || missionAccomplished)
+		if(get_tank(index).flag!="-"){
+			flag = true;
+		}
+		if (flag || missionAccomplished)
 		{
 			missionAccomplished = true;
 			setGoal(home[0], home[1]);
@@ -984,7 +987,7 @@ public:
 		double velocity = calculate_speed(pf);
 		speed(index, velocity);
 
-		if (shootBullet)
+		if (shootBullet && !missionAccomplished)
 			shoot(index);
 	}
 };
