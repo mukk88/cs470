@@ -122,6 +122,7 @@ class BZRC {
 	double home[2];
 	map<int, string> goalMapping;
 	string HOME;
+	bool missionAccomplished;
 	Node repulseArray[400][400];
 
 	// Initializing connection.
@@ -350,6 +351,7 @@ public:
 			goalMapping.insert( pair<int, string>(i, *(enemy_colors.begin())) );			
 		}
 		HOME = "home";
+		missionAccomplished = false;
 	}
 
 	~BZRC(){
@@ -960,23 +962,26 @@ public:
 	void pf_move(int index){
 		//calculate potential field
 		double pf[2];
+
 		bool mission_accomplished = calculate_potential_field(index, pf);
-		if (mission_accomplished)
+		if (mission_accomplished || missionAccomplished)
 		{
-			// speed(index, 0);
-			goalMapping[index] = HOME;
-			// return;
+			missionAccomplished = true;
+			setGoal(home[0], home[1]);
+			// goalMapping[index] = HOME;
+		}else{
+			setGoal(index);
 		}
-		setGoal(index);
 
 		// calculate angular velocity and velocity
-		double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, pf));
-		// double angularvel = calculate_angvel(index, pf);
+		double angularvel = calculate_angvel(index, pf);
 		angvel(index, angularvel);
-		double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(pf));
-		// double velocity = calculate_speed(pf);
+		double velocity = calculate_speed(pf);
 		speed(index, velocity);
 		// shoot(index);
+
+		// double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, pf));
+		// double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(pf));
 	}
 };
 
