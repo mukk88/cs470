@@ -46,7 +46,7 @@ void dumbAgents(vector<int> numbots, BZRC& myTeam){
 void pfAgents(vector<int> numbots, BZRC& myTeam){
 	for(int i=0;i<numbots.size();i++){
 		myTeam.pf_move(numbots[i]);
-		sleep(1);
+		sleep(2);
 	}
 }
 
@@ -95,6 +95,8 @@ int main(int argc, char *argv[]) {
 	botnums.push_back(3);
 	botnums.push_back(4);
 	botnums.push_back(5);
+
+
 
 	// botnums.push_back(4);
 	while(true){

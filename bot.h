@@ -838,8 +838,9 @@ public:
 				Node node, dir, tang;
 				double dirX = 0, dirY = 0;
 				for(int k=0;k<points.size();k++){
-					double repulseMag = repulseScalar * distancePoints(i,j,points[k]);
-					double tanMag = tanScalar * repulseMag/repulseScalar;
+					double repulseMag = repulseScalar * (repulseDistance -distancePoints(i,j,points[k]));
+					double tanMag = tanScalar * (repulseMag/repulseScalar);
+					// cout << repulseMag << " " << tanMag << endl;
 					dir.x = i - points[k].x;
 					dir.y = j - points[k].y;
 					norm(dir);
@@ -892,7 +893,7 @@ public:
 	double distancePoints(int startX, int startY, Node end){
 		double result =  sqrt( pow(end.x - startX, 2) + 
 			pow(end.y - startY, 2) );	
-		return result > repulseDistance ? 0 : result;
+		return result > repulseDistance ? repulseDistance : result;
 	}
 
 	void norm(Node& node){
@@ -940,15 +941,14 @@ public:
 	}		
 
 	double ratioed(double diff){
-		return diff/3.14*0.5;
+		return diff/M_PI*0.5;
 	}
 
 	double calculate_angvel(int index, double target[]){
 		tank_t tank = get_tank(index);
 		double tankAngle = fmod(tank.angle, M_PI*2);
 		double angle = atan2(target[1], target[0]);
-		double result = ratioed(angle - tankAngle);
-		return result; //max is 0.5
+		return ratioed(angle - tankAngle);
 	} 	
 
 	double calculate_speed(double pf[]){
@@ -963,24 +963,20 @@ public:
 		bool mission_accomplished = calculate_potential_field(index, pf);
 		if (mission_accomplished)
 		{
-			speed(index, 0);
-			// goalMapping[index] = HOME;
-			return;
+			// speed(index, 0);
+			goalMapping[index] = HOME;
+			// return;
 		}
-		// setGoal(index);
-		// double target[2] = {0,0};
-		// tank_t tank = get_tank(index);
-
-		// add_values(pf, tank.pos, target);
-
+		setGoal(index);
 
 		// calculate angular velocity and velocity
-		//double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, target));
-		double angularvel = calculate_angvel(index, pf);
+		double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, pf));
+		// double angularvel = calculate_angvel(index, pf);
 		angvel(index, angularvel);
-		//double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(target));
-		double velocity = calculate_speed(pf);
+		double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(pf));
+		// double velocity = calculate_speed(pf);
 		speed(index, velocity);
+		// shoot(index);
 	}
 };
 
