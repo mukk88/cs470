@@ -57,16 +57,9 @@ void printPotentials(ofstream& outfile, BZRC& myTeam){
 			double curLoc[2] = {start.x, start.y};
 			double deltas[2];
 			myTeam.calculate_attraction(curLoc, deltas);
-<<<<<<< Updated upstream
 			end.x += deltas[0];
 			end.y += deltas[1];
 			printLine(start,end, outfile);
-=======
-			end.x = deltas[0] + i;
-			end.y = deltas[1] + j;
-			// cout << end.x << " " << end.y << endl;
-			printLine(start, end,outfile);
->>>>>>> Stashed changes
 		}
 	}
 }

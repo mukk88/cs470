@@ -977,7 +977,6 @@ public:
 		}
 
 		// calculate angular velocity and velocity
-<<<<<<< HEAD
 		//double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, pf));
 		double angularvel = calculate_angvel(index, pf);
 		angvel(index, angularvel);
@@ -987,16 +986,6 @@ public:
 
 		if (shootBullet)
 			shoot(index);
-=======
-		double angularvel = calculate_angvel(index, pf);
-		angvel(index, angularvel);
-		double velocity = calculate_speed(pf);
-		speed(index, velocity);
-		// shoot(index);
-
-		// double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, pf));
-		// double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(pf));
->>>>>>> 0488f0897e42b1183ae1ddd7b161d60ce1d06a6b
 	}
 };
 
