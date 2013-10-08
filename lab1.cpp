@@ -43,10 +43,10 @@ void dumbAgents(vector<int> numbots, BZRC& myTeam){
 	}
 }
 
-void pfAgents(vector<int> numbots, BZRC& myTeam){
+void pfAgents(vector<int> numbots, BZRC& myTeam, bool shoot = false){
 	for(int i=0;i<numbots.size();i++){
-		myTeam.pf_move(numbots[i]);
-		sleep(2);
+		myTeam.pf_move(numbots[i], shoot);
+		sleep(1);
 	}
 }
 
@@ -99,8 +99,10 @@ int main(int argc, char *argv[]) {
 
 
 	// botnums.push_back(4);
+	int i = 0;
 	while(true){
-		pfAgents(botnums, myTeam);
+		i++;
+		pfAgents(botnums, myTeam, i % 4 == 0);
 	}
 	
 

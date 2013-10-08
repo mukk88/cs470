@@ -957,7 +957,10 @@ public:
 		return fmin(speed, 1); // maximum speed is 1
 	} 
 	
-	void pf_move(int index){
+	void pf_move(int index, bool shootBullet){
+		if (get_tank(index).status != "alive")
+			return;
+		
 		//calculate potential field
 		double pf[2];
 		bool mission_accomplished = calculate_potential_field(index, pf);
@@ -970,13 +973,15 @@ public:
 		setGoal(index);
 
 		// calculate angular velocity and velocity
-		double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, pf));
-		// double angularvel = calculate_angvel(index, pf);
+		//double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, pf));
+		double angularvel = calculate_angvel(index, pf);
 		angvel(index, angularvel);
-		double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(pf));
-		// double velocity = calculate_speed(pf);
+		//double velocity = velocityControllers[index]->get_value(latestVelocity[index], calculate_speed(pf));
+		double velocity = calculate_speed(pf);
 		speed(index, velocity);
-		// shoot(index);
+
+		if (shootBullet)
+			shoot(index);
 	}
 };
 
