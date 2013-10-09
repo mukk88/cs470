@@ -19,7 +19,7 @@ using namespace std;
 
 #define MAX_OBSTACLE_CORNERS 10
 const int kBufferSize = 1024;
-#define repulseDistance 50
+#define repulseDistance 35
 
 struct Node{
 	double x;
@@ -124,6 +124,7 @@ class BZRC {
 	string HOME;
 	bool missionAccomplished;
 	Node repulseArray[400][400];
+
 
 	// Initializing connection.
 	int Init() {
@@ -835,7 +836,7 @@ public:
 		//loop through all points for whole map
 		for(int j=0;j<800;j+=2){
 			for(int i=0;i<800;i+=2){
-				double repulseScalar = 0.2;
+				double repulseScalar = 0.5;
 				double tanScalar = 0.3;
 				Node node, dir, tang;
 				double dirX = 0, dirY = 0;
@@ -943,41 +944,46 @@ public:
 	}		
 
 	double ratioed(double diff){
-		return diff/M_PI*0.5;
+		return diff/M_PI*1;
 	}
 
 	double calculate_angvel(int index, double target[]){
 		tank_t tank = get_tank(index);
 		double tankAngle = fmod(tank.angle, M_PI*2);
+		// if tank
+
+
 		double angle = atan2(target[1], target[0]);
+		// if(abs(angle) > M_PI/2){
+		// 	angle = (angle/abs(angle))* (abs(angle)-M_PI/2);
+		// }
 		return ratioed(angle - tankAngle);
 	} 	
 
 	double calculate_speed(double pf[]){
 		double distance = sqrt( pow(pf[0], 2) + pow(pf[1], 2) );
-		double speed = distance / 50;
+		double speed = distance / 30;
 		return fmin(speed, 1); // maximum speed is 1
 	} 
 	
-	void pf_move(int index, bool shootBullet){
+	bool pf_move(int index, bool shootBullet){
 		if (get_tank(index).status != "alive")
-			return;
+			return false;
 		
-		//calculate potential field
-		double pf[2];
-		bool flag;
-		bool mission_accomplished = calculate_potential_field(index, pf);
+		//setGoal
 		if(get_tank(index).flag!="-"){
-			flag = true;
-		}
-		if (flag || missionAccomplished)
-		{
+			goal[0] = home[0];
+			goal[1] = home[1];
 			missionAccomplished = true;
-			setGoal(home[0], home[1]);
-			// goalMapping[index] = HOME;
 		}else{
 			setGoal(index);
 		}
+
+
+
+		double pf[2];
+		bool mission_accomplished = calculate_potential_field(index, pf);
+
 
 		// calculate angular velocity and velocity
 		//double angularvel = angleControllers[index]->get_value(latestAngVel[index], calculate_angvel(index, pf));
@@ -987,8 +993,14 @@ public:
 		double velocity = calculate_speed(pf);
 		speed(index, velocity);
 
-		if (shootBullet && !missionAccomplished)
+		if (shootBullet)
 			shoot(index);
+
+		if(get_tank(index).flag!="-"){
+			return true;
+		}else{
+			return false;
+		}
 	}
 };
 

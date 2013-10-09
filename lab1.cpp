@@ -10,6 +10,8 @@ const char *kDefaultServerName = "localhost";
 const int kDefaultServerPort = 4000;
 bool debugMode = false;
 
+int flagBearer = -1;
+
 void robot_post_update(){
 	
 }
@@ -44,10 +46,20 @@ void dumbAgents(vector<int> numbots, BZRC& myTeam){
 }
 
 void pfAgents(vector<int> numbots, BZRC& myTeam, bool shoot = false){
-	for(int i=0;i<numbots.size();i++){
-		myTeam.pf_move(numbots[i], shoot);
-		sleep(1);
+	bool goal = false;
+	if(flagBearer!=-1){
+		if(!myTeam.pf_move(flagBearer, shoot)){
+			flagBearer = -1;
+		}
 	}
+	else{
+		for(int i=0;i<numbots.size();i++){
+			if(myTeam.pf_move(numbots[i], shoot)){
+				flagBearer = numbots[i];
+			}
+		}
+	}
+	sleep(1);
 }
 
 int main(int argc, char *argv[]) {
@@ -95,15 +107,23 @@ int main(int argc, char *argv[]) {
 	botnums.push_back(3);
 	botnums.push_back(4);
 	botnums.push_back(5);
+	botnums.push_back(0);
+	botnums.push_back(9);
+	botnums.push_back(8);
+	botnums.push_back(7);
+	botnums.push_back(6);
 
 
 
-	// botnums.push_back(4);
 	int i = 0;
 	while(true){
 		i++;
 		pfAgents(botnums, myTeam, i % 4 == 0);
 	}
+
+	// while(true){
+	// 	dumbAgents(botnums, myTeam);
+	// }
 	
 
 
