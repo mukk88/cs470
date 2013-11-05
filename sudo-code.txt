@@ -1,0 +1,10 @@
+call constants and store likelihoods
+determine prior probability
+
+Divide the robots in half.
+Send half the robots to one corner and half to another corner
+Use a lawnmower search pattern and have the tanks work towards one another (set a constant velocity and take measurements every second or so)
+	for each state si,j of the world
+     observe oi,j from the set {hit, miss, no_data}
+      update p(si,j = occupied | oi,j) = p(oi,j | si,j = occupied)p(si,j = occupied) / p(oi,j)
+      add repulsion points
