@@ -6,6 +6,9 @@
 #include "command.h"
 #include "agent.h"
 #include "potentialfield.h"
+
+#include "occgrid.h"
+
 using namespace std;
 
 const char *kDefaultServerName = "localhost";
@@ -80,6 +83,10 @@ int main(int argc, char *argv[]) {
 
 	BZRC* myTeam = new BZRC(pcHost, port, false);
 	PotentialField* pfield = new PotentialField(myTeam);
+
+	OccGrid o;
+	myTeam->get_occ(1, o);
+
 	vector<Agent> agents;
 	for(int i=0;i<10;i++){
 		Agent a = Agent(myTeam, pfield, "green");

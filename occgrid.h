@@ -7,6 +7,10 @@ using namespace std;
 
 class OccGrid{
 public:
+	OccGrid(){
+		
+	}
+
 	OccGrid(int x, int y, int w, int h) : 
 		xStart(x), yStart (y), width(w), height(h), index(0)  {
 		occupancy = new bool*[height];

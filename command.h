@@ -13,6 +13,9 @@
 #include <unistd.h>
 #include <vector>
 #include <cmath>
+#include <sstream>
+#include "occgrid.h"
+#include <stddef.h>
 
 using namespace std;
 
@@ -450,6 +453,60 @@ public:
 			return false;
 		}
 		return true;
+	}
+
+	bool get_occ(int i, OccGrid& grid){
+		stringstream ss;
+		ss << i;
+		string command = "occgrid " + ss.str();
+		cout << command << endl;
+		SendLine(command.c_str());
+		ReadAck();
+		vector <string> v=ReadArr();
+		if(v.at(0)!="begin") {
+			return false;
+		}
+		v.clear();
+		//the at value
+		v=ReadArr();
+		vector<string> at = splitbyChar(v[1], ',');
+		int startx = atoi(at[0].c_str());
+		int starty = atoi(at[1].c_str());
+		v.clear();
+		v=ReadArr();
+		vector<string> result = splitbyChar(v[1],'x');
+		int h = atoi(result[0].c_str());
+		int w = atoi(result[1].c_str());
+		for(int i=0;i<h;i++){
+			v=ReadArr();
+			v.clear();
+		}
+		v=ReadArr();
+		if(v[0]!="end"){
+			return false;
+		}
+		grid = OccGrid(startx, starty, w, h);
+		return true;
+	}
+
+	vector<string> splitbyChar(string s, char c){
+		vector<string> v;
+		bool found = false;
+		int index = 0;
+		string temp, temp2;
+		for(int i=0;i<s.size();i++){
+			if(s[i]!=c){
+				temp += s[i];
+			}else{
+				found = true;
+				index = i;
+				break;
+			}
+		}
+		temp2 = s.substr(index+1,s.length());
+		v.push_back(temp);
+		v.push_back(temp2);
+		return v;
 	}
 
 	bool get_obstacles(vector <obstacle_t>& AllObstacles) {
