@@ -39,6 +39,7 @@ public:
 	int getYStart() { return yStart; }
 	int getWidth() { return width; }
 	int getHeight() { return height; }
+	bool occupied(int row, int col) { return occupancy[row][col]; }
 
 private:
 	int xStart;

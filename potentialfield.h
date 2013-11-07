@@ -1,5 +1,6 @@
 #pragma once
 #include "command.h"
+#include <vector>
 
 #define repulseDistance 35
 
@@ -13,6 +14,7 @@ public:
 	double replusionConst;
 	Node repulseArray[400][400];
 	BZRC*commandCenter;
+	vector<Node> replusePoints;
 
 	PotentialField(BZRC* bzrc){
 		commandCenter = bzrc;
@@ -118,6 +120,31 @@ public:
 		return result > repulseDistance ? repulseDistance : result;
 	}
 
+	void calculate_repulsion(double pos[], double repulsion[]){
+
+		for (int i = 0; i < replusePoints.size(); ++i){
+
+			double distance = distancePoints(pos[0], pos[1], replusePoints[i]);
+			
+			if (distance < attractionSpread){
+				double coefficent = attractionConst * (attractionSpread - distance);
+				double pointRepulsion[2];
+				double angle = angle_from_tank_to_point(pos, replusePoints[i]);
+				
+				pointRepulsion[0] = coefficent * cos(angle);
+				pointRepulsion[1] = coefficent * sin(angle);
+
+				repulsion[0] += pointRepulsion[0];
+				repulsion[1] += pointRepulsion[1];
+			}
+		}
+	}
+
+
+	double angle_from_tank_to_point(double currentLocation[], Node & object){
+		return atan2( currentLocation[1] - object.y,
+			 currentLocation[0] - object.x );	
+	}
 
 	void calculate_repulsion(){
 		vector<obstacle_t> obstacles;
@@ -140,5 +167,12 @@ public:
 				repulsion[i][j].y = repulseArray[i][j].y;
 			}
 		}
+	}
+
+	void addPoint(int pos[]){
+		Node result;
+		result.x = pos[0];
+		result.y = pos[1];
+		replusePoints.push_back(result);
 	}
 };

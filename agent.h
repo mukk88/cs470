@@ -3,7 +3,7 @@
 #include "potentialfield.h"
 
 class Agent{
-private:
+protected:
 	string color;
 	double goal[2];
 	double home[2];
@@ -96,7 +96,9 @@ public:
 		int tankX = (tank.pos[0] + 400)/2;
 		int tankY = (tank.pos[1] + 400)/2;
 
-		double repulsion[2] = {pfield->repulseArray[tankX][tankY].x,pfield->repulseArray[tankX][tankY].y};
+		// FOR POTENTIAL FIELDS LAB
+		double repulsion[2];// = {pfield->repulseArray[tankX][tankY].x,pfield->repulseArray[tankX][tankY].y};
+		pfield->calculate_repulsion(tank.pos, repulsion);
 		add_values(attraction, repulsion, pf);
 		return false;
 	}		
@@ -123,7 +125,7 @@ public:
 			return false;
 		
 		//setGoal
-		if(get_tank(index).flag!="-"){
+		if(reached_goal(index)){ //get_tank(index).flag!="-" || 
 			goal[0] = home[0];
 			goal[1] = home[1];
 			missionAccomplished = true;
@@ -147,6 +149,10 @@ public:
 		}else{
 			return false;
 		}
+	}
+
+	bool reached_goal(int index){
+		return (distancePoints(goal, get_tank(index).pos) < 3);
 	}
 
 	bool set_home_location() {	
