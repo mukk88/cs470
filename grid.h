@@ -27,7 +27,7 @@ public:
 		delete [] grid;
 	}
 
-	void updateGrid(int x, int y, double value){
+	void setValue(int x, int y, double value){
 		grid[y][x] = value;
 	}
 
