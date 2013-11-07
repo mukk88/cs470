@@ -102,12 +102,12 @@ int main(int argc, char *argv[]) {
 
 	vector<ObstacleSearchAgent> agents;
 	for(int i=0;i<2;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, false, grid);
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, true, grid);
 		a.setGoal(-375, -375);
 		agents.push_back(a);
 	}
 	for(int i=2;i<4;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, true, grid);
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, false, grid);
 		a.setGoal(375, 375);
 		agents.push_back(a);
 	}
