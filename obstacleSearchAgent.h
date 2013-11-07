@@ -51,9 +51,9 @@ public:
 		double pos[2];
 		pos[0] = get_tank().pos[0];
 		pos[1] = get_tank().pos[1];
-		if (distancePoints(pos, prevPos) < 3){
+		/*if (distancePoints(pos, prevPos) < 3){
 			pfield->addPoint(pos);
-		}
+		}*/
 		prevPos[0] = pos[0];
 		prevPos[1] = pos[1];
 	}

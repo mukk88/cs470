@@ -124,15 +124,16 @@ public:
 		
 		//setGoal
 		if(reached_goal()){
-			goal[0] = home[0];
-			goal[1] = home[1];
+			/*goal[0] = home[0];
+			goal[1] = home[1];*/
 			missionAccomplished = true;
-		}else{
-			setGoal();
 		}
+		/*else{
+			setGoal();
+		}*/
 
 		double pf[2];
-		bool mission_accomplished = calculate_potential_field(pf);
+		calculate_potential_field(pf);
 
 		double angularvel = calculate_angvel(pf);
 		commandCenter->angvel(index, angularvel);
@@ -142,15 +143,16 @@ public:
 		if (shootBullet)
 			commandCenter->shoot(index);
 
-		if(get_tank().flag!="-"){
+		/*if(get_tank().flag!="-"){
 			return true;
 		}else{
 			return false;
-		}
+		}*/
+		return missionAccomplished;
 	}
 
 	bool reached_goal(){
-		return (distancePoints(goal, get_tank().pos) < 3);
+		return (distancePoints(goal, get_tank().pos) < 50);
 	}
 
 	bool set_home_location() {	
