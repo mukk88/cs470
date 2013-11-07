@@ -53,19 +53,34 @@ def init_window(width, height):
     glLoadIdentity()
     # glutMainLoop()
 
+def readfile(g):
+    try:
+        f = open('output.txt', 'r')
+
+        for i in range(800):
+            line = f.readline()
+            arr = line.split()
+            for j in range(800):
+                g[i][j] = arr[j]
+        end = f.readline().strip()
+        return True
+    except:
+        return False
+
 if __name__ == '__main__':
+
     # h = Hello()
     # h.start()
-    time.sleep(0.5)
+    # time.sleep(0.5)
 
     init_window(800,800)
     grid2 = ones((800,800))
 
     while True:
         # read the file and populate the grid
-        for i in range(800):
-            for j in range(800):
-                grid2[j][i] = random.random()
+        read = False
+        while not read:
+            read = readfile(grid2)            
         update_grid(grid2)
         draw_grid()
         time.sleep(1)
