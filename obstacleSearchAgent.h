@@ -46,7 +46,7 @@ public:
 				goal[0] += (moveRight) ? 25 : -25;
 			}
 		}
-		Agent::move(false);
+		Agent::move(true);
 
 		double pos[2];
 		pos[0] = get_tank().pos[0];
@@ -70,15 +70,15 @@ public:
 				double occupied_belief = 0;
 				double unoccupied_belief = 0;
 				if (grid.occupied(y, x)){
-					occupied_belief = truePos * mainGrid.getValue(x,y);
-					unoccupied_belief = trueNeg * (1-mainGrid.getValue(x,y));
+					occupied_belief = truePos * mainGrid->getValue(x,y);
+					unoccupied_belief = trueNeg * (1-mainGrid->getValue(x,y));
 				}
 				else {
-					occupied_belief = (1-truePos) * mainGrid.getValue(x,y);
-					unoccupied_belief = (1-trueNeg) * (1-mainGrid.getValue(x,y));
+					occupied_belief = (1-truePos) * mainGrid->getValue(x,y);
+					unoccupied_belief = (1-trueNeg) * (1-mainGrid->getValue(x,y));
 				}
 
-				mainGrid.setValue(x,y, occupied_belief / (occupied_belief + unoccupied_belief));
+				mainGrid->setValue(x,y, occupied_belief / (occupied_belief + unoccupied_belief));
 			}
 		}
 	}

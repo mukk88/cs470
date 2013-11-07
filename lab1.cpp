@@ -97,26 +97,30 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	/*ObstacleSearchAgent::initializeGrid(atoi(constants[1].value.c_str()));
+	int worldSize = atoi(constants[1].value.c_str());
+	Grid* grid = new Grid(worldSize, worldSize);
 
-	vector<constant_t>::iterator it = constants.end(); 
-	ObstacleSearchAgent::setTrueNegative(atoi((*it--).value.c_str()));
-	ObstacleSearchAgent::setTruePositive(atoi((*it).value.c_str()));*/
-
-	vector<Agent> agents;
-	for(int i=0;i<4;i++){
-		//int index, BZRC* bzrc, PotentialField* p, string color, bool moveR, bool moveU
-		Agent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, false);
+	vector<ObstacleSearchAgent> agents;
+	for(int i=0;i<2;i++){
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, false, grid);
+		a.setGoal(-375, -375);
 		agents.push_back(a);
 	}
+	for(int i=2;i<4;i++){
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, true, grid);
+		a.setGoal(375, 375);
+		agents.push_back(a);
+	}
+
 	while(true){
 		for(int i=0;i<agents.size();i++){
-			agents[i].move(true);
+			agents[i].move();
 		}
 	}
 
 	delete myTeam;
 	delete pfield;
+	delete grid;
 	cout << "done" << endl;
 	return 0;
 }

@@ -14,7 +14,7 @@ protected:
 	BZRC*commandCenter;
 	PotentialField* pfield; 
 public:
-	Agent(int index, BZRC* bzrc, PotentialField* p, string color){
+	Agent(int i, BZRC* bzrc, PotentialField* p, string color) : index(i){
 		commandCenter = bzrc;
 		pfield = p;
 		HOME = "home";
