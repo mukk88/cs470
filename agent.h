@@ -4,24 +4,23 @@
 
 class Agent{
 protected:
+	int index;
 	string color;
 	double goal[2];
 	double home[2];
-	map<int, string> goalMapping;
+	string goalName;
 	string HOME;
 	bool missionAccomplished;
 	BZRC*commandCenter;
 	PotentialField* pfield; 
 public:
-	Agent(BZRC* bzrc, PotentialField* p, string color){
+	Agent(int index, BZRC* bzrc, PotentialField* p, string color){
 		commandCenter = bzrc;
 		pfield = p;
 		HOME = "home";
 		vector<tank_t> myTanks;
 		commandCenter->get_mytanks(myTanks);
-		for (int i = 0; i < myTanks.size(); ++i){
-			goalMapping.insert( pair<int, string>(i, color) );			
-		}
+		goalName = color;
 		missionAccomplished = false;
 	}
 
@@ -43,8 +42,7 @@ public:
 		goal[1] = y;
 	}
 
-	void setGoal(int index){
-		string goalName = goalMapping[index];
+	void setGoal(){
 		if (goalName.compare(HOME) == 0)
 		{
 			goal[0] = home[0];
@@ -75,7 +73,7 @@ public:
 	}
 
 
-	tank_t get_tank(int index){
+	tank_t get_tank(){
 		vector<tank_t> myTanks;
 		commandCenter->get_mytanks(myTanks);
 		return myTanks[index];
@@ -86,8 +84,8 @@ public:
 		result[1] = a[1] + b[1];
 	}
 
-	bool calculate_potential_field(int index, double pf[]){
-		tank_t tank = get_tank(index);
+	bool calculate_potential_field(double pf[]){
+		tank_t tank = get_tank();
 		double attraction[2];
 		calculate_attraction(tank.pos, attraction);
 		if (attraction[0] == 0 && attraction[1] == 0)
@@ -107,8 +105,8 @@ public:
 		return diff/M_PI*1;
 	}
 
-	double calculate_angvel(int index, double target[]){
-		tank_t tank = get_tank(index);
+	double calculate_angvel(double target[]){
+		tank_t tank = get_tank();
 		double tankAngle = fmod(tank.angle, M_PI*2);
 		double angle = atan2(target[1], target[0]);
 		return ratioed(angle - tankAngle);
@@ -120,23 +118,23 @@ public:
 		return fmin(speed, 1); // maximum speed is 1
 	} 
 	
-	bool pf_move(int index, bool shootBullet){
-		if (get_tank(index).status != "alive")
+	virtual bool move(bool shootBullet){
+		if (get_tank().status != "alive")
 			return false;
 		
 		//setGoal
-		if(reached_goal(index)){ //get_tank(index).flag!="-" || 
+		if(reached_goal()){
 			goal[0] = home[0];
 			goal[1] = home[1];
 			missionAccomplished = true;
 		}else{
-			setGoal(index);
+			setGoal();
 		}
 
 		double pf[2];
-		bool mission_accomplished = calculate_potential_field(index, pf);
+		bool mission_accomplished = calculate_potential_field(pf);
 
-		double angularvel = calculate_angvel(index, pf);
+		double angularvel = calculate_angvel(pf);
 		commandCenter->angvel(index, angularvel);
 		double velocity = calculate_speed(pf);
 		commandCenter->speed(index, velocity);
@@ -144,15 +142,15 @@ public:
 		if (shootBullet)
 			commandCenter->shoot(index);
 
-		if(get_tank(index).flag!="-"){
+		if(get_tank().flag!="-"){
 			return true;
 		}else{
 			return false;
 		}
 	}
 
-	bool reached_goal(int index){
-		return (distancePoints(goal, get_tank(index).pos) < 3);
+	bool reached_goal(){
+		return (distancePoints(goal, get_tank().pos) < 3);
 	}
 
 	bool set_home_location() {	

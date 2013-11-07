@@ -1,12 +1,24 @@
 Attraction Fields
-	We picked an attraction field to guide the tanks to the opponents flags. The potential fields have both a strength and an angle. The strength of the attraction was proportionate to the distance to the goal. We also set a maximum strength to the potential field when the tank was too far away. The strength of the attraction approaches 0 as the point reaches the goal. To get the angle of the potential fields, we calulated the angle from each point to the goal. 
+	We picked an attraction field to guide the tanks to the opponents flags. The potential fields have both a strength and an angle. The strength of the attraction was proportional to the distance to the goal. We also set a maximum strength to the potential field when the tank was too far away. The strength of the attraction approaches 0 as the point reaches the goal. To get the angle of the potential fields, we calulated the angle from each point to the goal. 
 
 Repulsion fields
+	We used repulsion fields to steer tanks away from obstacles on the map. Tanks were repulsed by individual points along the obstacles. These points were placed every 25 units. The range of the replusion was 12.5 units so that the repulsion fields overlapped. Each of the repulsion fields had both a magnitude and an angle. The magnitude of the replusion was inversely porportional to the tank's distance from point of repulsion. The angle pointed directly from the point of replusion to the tank.
+	Before deciding on this implementation for replusion fields, we considered two other methods. The first was treating the rectangles as circles. The repulsion field would push tanks away from the obstacle as if the obastacle were a circle that completely emcompased the rectangle obstacle. However, we decided this would cause problems on the four "L's" map where there is a long rectangular obstacle in the middle. The repulsion field would be so large that it would prevent all tanks from travelling through the center.
+	The other method we considered using was using quadrants. Given an obstacle, we would calculate which of the four sides or four corners the tank was in. If it fell within range of a side, the tank would be repulsed in a direction perpendicular to the side. If the tank fell within range of one of the four corners, the tank would be repulsed at the angle of the tank from the corner. We abandoned this method because we thought that our final solution would be easier to implement.
 
 Tangential fields
+	The tangential fields are used to steer tanks around obstacles. This prevents tanks from getting stuck in an area where the replusion field and attraction field negate one another and leave the tank without a direction and magnitude. Therefore, the tangential fields cover the same area as the repulsion fields. The strength of the tangential fields is inversely porportional to the tank's distance from the point of repulsion. The direction of the tangential field is perpendicular to the repulsion vector. This angle is the repulsion angle rotated 90 degrees in the clockwise direction.
 
 Tuning process
+	As part of the tuning process, we played with scalars for each of the field types. We tried increasing and decreasing values for the attraction scalar, the repulsion scalar, and the tangential scalar. Ultimately, we decided on the same scalar for attraction and repulsion and a slightly larger scalar for the tangential fields.
+	We also played around with varying the maximum angular velocity and velocity. We tried restricting the angular velocity to the -0.5 to 0.5 range because the tanks appeared to turn too quickly, however, this restriction hindered more than helped in the end. The maximum velocity although not intentional, hindered our robots so we removed it.
 
-Why we picked them
-What we did
-How we did it
+PF Agent v. One Dumb Agent
+	The green team was the PF agent, and the blue team was the dumb agent. The green agent was able to successfully capture the flag and return without much trouble. However, we noticed that our pf agents were significantly slower than the dumb bots. We changed our constants to make the pf agents move faster. These conditions were the same for both maps.
+
+PF Agent v. Two Dumb Agents
+	The blue team was the PF agent, and the purple and green teams were dumb agents. The blue team was able to successfully complete its mission. The pruple team had almost not affect on the game, other than occassionally shooting an agent from one of the other teams. At one point, the blue bots surrounded the blue flag bearer and trapped him temporarily until he shot them and cleared his path to the goal. This is because after someone from their team picks up the flag they are purpusing, the stop recieving commands from the potential fields about how to move. Therefore, they can tend to cluster.
+
+
+PF Agent v. PF Agent
+	The red team was able to capture the flag succesfully on the simple map more easily than the green team because the red team did not have any obstacles in their path. The green team had to go around the obstacle to reach the goal. When on the four L's map, the blue team won because all the blue tanks formed in more congregated state and the green team was more spread out. Therefore, the blue tanks were able to provide more cover for one another. The green tanks were easily picked off.

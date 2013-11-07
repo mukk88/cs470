@@ -169,7 +169,7 @@ public:
 		}
 	}
 
-	void addPoint(int pos[]){
+	void addPoint(double pos[]){
 		Node result;
 		result.x = pos[0];
 		result.y = pos[1];

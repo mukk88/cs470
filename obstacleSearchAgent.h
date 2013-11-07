@@ -8,17 +8,17 @@
 
 using namespace std;
 
-class ObstacleSearchAgent : Agent {
+class ObstacleSearchAgent : public Agent {
 
 public:
 
-	ObstacleSearchAgent(int gd, double truePositive, double trueNegative, moveR, moveU) : moveRight(moveR)
-		gridDimension(gd), truePos(truePositive), trueNeg(trueNegative), moveVertical(true), moveUp(moveU) {
+	ObstacleSearchAgent(int index, BZRC* bzrc, PotentialField* p, string color, 
+		bool moveR, bool moveU): Agent(index, bzrc, p, color) {
 
-		observedObstacles = new double*[gd];
-		for(int i = 0; i < gd; ++i) {
-		    observedObstacles[i] = new double[gd];
-		}
+		moveVertical = true;
+		moveUp = moveU;
+		moveRight = moveR;
+
 	}
 
 	~ObstacleSearchAgent() {
@@ -28,19 +28,22 @@ public:
 		delete [] observedObstacles;
 	}
 
-private:
-	int gridDimension;
-	double** observedObstacles;
-	vector<int> bots;
-	double truePos;
-	double trueNeg;
-	bool moveVertical;
-	bool moveUp;
-	const bool moveRight;
-	int prevPos[2];
-	vector<int[2]> replusionPoints;
+	/*static void initializeGrid(int gd){
+		observedObstacles = new double*[gd];
+		for(int i = 0; i < gd; ++i) {
+		    observedObstacles[i] = new double[gd];
+		}
+	}*/
 
-	void move(int b){
+	void setTruePositive(double truePositive){
+		truePos = truePositive;
+	}
+
+	void setTrueNegative(double trueNegative){
+		trueNeg = trueNegative;
+	}
+
+	bool move(){
 		if (missionAccomplished){
 			missionAccomplished = false;
 			if (moveVertical){
@@ -52,18 +55,34 @@ private:
 				goal[0] += (moveRight) ? 25 : -25;
 			}
 		}
-		pfMove(b, false);
+		Agent::move(false);
 
-		int[] pos = get_tank(index).pos;
+		double pos[2];
+		pos[0] = get_tank().pos[0];
+		pos[1] = get_tank().pos[1];
 		if (distancePoints(pos, prevPos) < 3){
 			pfield->addPoint(pos);
 		}
-		prevPos = pos;
+		prevPos[0] = pos[0];
+		prevPos[1] = pos[1];
 	}
 
-	void observe(int b){
+private:
+	int gridDimension;
+	double** observedObstacles;
+	vector<int> bots;
+	bool moveVertical;
+	bool moveUp;
+	bool moveRight;
+	double prevPos[2];
+	double truePos;
+	double trueNeg;
+
+	//static void 
+
+	void observe(){
 		OccGrid grid;
-		commandCenter->get_occ(b, grid);
+		commandCenter->get_occ(index, grid);
 		for (int i = 0; i < grid.getHeight(); ++i){
 			int y = grid.getYStart() + i;
 			for (int j = 0; j < grid.getWidth(); ++j){

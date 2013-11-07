@@ -1,11 +1,14 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #include <iostream>
+#include <algorithm>
+#include <iterator>
 #include <unistd.h>
 #include <ctype.h>
 #include <vector>
 #include "command.h"
 #include "agent.h"
 #include "potentialfield.h"
+#include "obstacleSearchAgent.h"
 
 #include "occgrid.h"
 
@@ -87,14 +90,28 @@ int main(int argc, char *argv[]) {
 	OccGrid o;
 	myTeam->get_occ(1, o);
 
+	// retrieve constants
+	vector<constant_t> constants;
+	if (!myTeam->get_constants(&constants)){
+		cerr << "unable to retrieve constants" << endl;
+		return -1;
+	}
+
+	/*ObstacleSearchAgent::initializeGrid(atoi(constants[1].value.c_str()));
+
+	vector<constant_t>::iterator it = constants.end(); 
+	ObstacleSearchAgent::setTrueNegative(atoi((*it--).value.c_str()));
+	ObstacleSearchAgent::setTruePositive(atoi((*it).value.c_str()));*/
+
 	vector<Agent> agents;
-	for(int i=0;i<10;i++){
-		Agent a = Agent(myTeam, pfield, "green");
+	for(int i=0;i<4;i++){
+		//int index, BZRC* bzrc, PotentialField* p, string color, bool moveR, bool moveU
+		Agent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, false);
 		agents.push_back(a);
 	}
 	while(true){
 		for(int i=0;i<agents.size();i++){
-			agents[i].pf_move(i,true);
+			agents[i].move(true);
 		}
 	}
 
