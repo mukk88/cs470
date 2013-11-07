@@ -5,6 +5,7 @@
 #include "occgrid.h"
 #include "agent.h"
 #include "command.h"
+#include "grid.h"
 
 using namespace std;
 
@@ -13,27 +14,17 @@ class ObstacleSearchAgent : public Agent {
 public:
 
 	ObstacleSearchAgent(int index, BZRC* bzrc, PotentialField* p, string color, 
-		bool moveR, bool moveU): Agent(index, bzrc, p, color) {
+		bool moveR, bool moveU, Grid* g): Agent(index, bzrc, p, color) {
 
 		moveVertical = true;
 		moveUp = moveU;
 		moveRight = moveR;
+		mainGrid = g;
 
 	}
 
 	~ObstacleSearchAgent() {
-		for(int i = 0; i < gridDimension; ++i) {
-		    delete [] observedObstacles[i];
-		}
-		delete [] observedObstacles;
 	}
-
-	/*static void initializeGrid(int gd){
-		observedObstacles = new double*[gd];
-		for(int i = 0; i < gd; ++i) {
-		    observedObstacles[i] = new double[gd];
-		}
-	}*/
 
 	void setTruePositive(double truePositive){
 		truePos = truePositive;
@@ -67,19 +58,6 @@ public:
 		prevPos[1] = pos[1];
 	}
 
-private:
-	int gridDimension;
-	double** observedObstacles;
-	vector<int> bots;
-	bool moveVertical;
-	bool moveUp;
-	bool moveRight;
-	double prevPos[2];
-	double truePos;
-	double trueNeg;
-
-	//static void 
-
 	void observe(){
 		OccGrid grid;
 		commandCenter->get_occ(index, grid);
@@ -92,18 +70,30 @@ private:
 				double occupied_belief = 0;
 				double unoccupied_belief = 0;
 				if (grid.occupied(y, x)){
-					occupied_belief = truePos * observedObstacles[y][x];
-					unoccupied_belief = trueNeg * (1-observedObstacles[y][x]);
+					occupied_belief = truePos * mainGrid.getValue(x,y);
+					unoccupied_belief = trueNeg * (1-mainGrid.getValue(x,y));
 				}
 				else {
-					occupied_belief = (1-truePos) * observedObstacles[y][x];
-					unoccupied_belief = (1-trueNeg) * (1-observedObstacles[y][x]);
+					occupied_belief = (1-truePos) * mainGrid.getValue(x,y);
+					unoccupied_belief = (1-trueNeg) * (1-mainGrid.getValue(x,y));
 				}
 
-				observedObstacles[y][x] = occupied_belief / (occupied_belief + unoccupied_belief);
+				mainGrid.setValue(x,y, occupied_belief / (occupied_belief + unoccupied_belief));
 			}
 		}
 	}
+
+private:
+	int gridDimension;
+	Grid* mainGrid;
+	vector<int> bots;
+	bool moveVertical;
+	bool moveUp;
+	bool moveRight;
+	double prevPos[2];
+	double truePos;
+	double trueNeg;
+
 };
 
 #endif
