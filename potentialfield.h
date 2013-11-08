@@ -21,7 +21,7 @@ public:
 		attractionSpread = 100;
 		attractionConst = -0.2;
 		repulsionSpread = 25;
-		repulsionConst = -0.8;
+		repulsionConst = 0.5;
 		calculate_repulsion();
 	}
 

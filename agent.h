@@ -109,7 +109,7 @@ public:
 	}		
 
 	double ratioed(double diff){
-		return diff/M_PI*1;
+		return diff/(M_PI/2);
 	}
 
 	double calculate_angvel(double target[]){
@@ -121,7 +121,7 @@ public:
 
 	double calculate_speed(double pf[]){
 		double distance = sqrt( pow(pf[0], 2) + pow(pf[1], 2) );
-		double speed = distance / 30;
+		double speed = distance / 10;
 		return fmin(speed, 1); // maximum speed is 1
 	} 
 	
