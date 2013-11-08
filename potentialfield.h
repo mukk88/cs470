@@ -20,7 +20,7 @@ public:
 		commandCenter = bzrc;
 		attractionSpread = 100;
 		attractionConst = -0.2;
-		repulsionSpread = 50;
+		repulsionSpread = 25;
 		repulsionConst = -0.8;
 		calculate_repulsion();
 	}

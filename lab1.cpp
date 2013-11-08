@@ -106,11 +106,11 @@ int main(int argc, char *argv[]) {
 		a.setGoal(-375, -375);
 		agents.push_back(a);
 	}
-	for(int i=2;i<4;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, false, grid);
-		a.setGoal(375, 375);
-		agents.push_back(a);
-	}
+	// for(int i=2;i<4;i++){
+	// 	ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, false, grid);
+	// 	a.setGoal(375, 375);
+	// 	agents.push_back(a);
+	// }
 
 	while(true){
 		for(int i=0;i<agents.size();i++){

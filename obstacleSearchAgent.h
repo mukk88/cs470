@@ -36,15 +36,19 @@ public:
 	}
 
 	bool move(){
+		if (get_tank().status != "alive")
+			return false;
+
 		if (missionAccomplished){
 			missionAccomplished = false;
 			if (moveVertical){
 				moveVertical = false;
-				goal[1] += (moveUp) ? 775 : -775;
+				goal[1] += (moveUp) ? 750 : -750;
 				moveUp = !moveUp;
 			}
 			else { // move horizontal
 				goal[0] += (moveRight) ? 25 : -25;
+				moveVertical = true;
 			}
 		}
 		Agent::move(true);
@@ -52,10 +56,10 @@ public:
 		double pos[2];
 		pos[0] = get_tank().pos[0];
 		pos[1] = get_tank().pos[1];
-		/*if (distancePoints(pos, prevPos) < .0001){
+		if (distancePoints(pos, prevPos) < .0001){
 			pfield->addPoint(pos);
-			cout << index << " is placing a replusion point" << endl;
-		}*/
+			cout << index << " is placing a replusion point at " << pos[0] << ", " << pos[1] << endl;
+		}
 		prevPos[0] = pos[0];
 		prevPos[1] = pos[1];
 	}
