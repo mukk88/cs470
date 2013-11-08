@@ -10,8 +10,8 @@ private:
 public:
 	int attractionSpread;
 	double attractionConst;
-	int replusionSpread;
-	double replusionConst;
+	int repulsionSpread;
+	double repulsionConst;
 	Node repulseArray[400][400];
 	BZRC*commandCenter;
 	vector<Node> replusePoints;
@@ -20,8 +20,8 @@ public:
 		commandCenter = bzrc;
 		attractionSpread = 100;
 		attractionConst = -0.2;
-		replusionSpread = 50;
-		replusionConst = -0.8;
+		repulsionSpread = 50;
+		repulsionConst = -0.8;
 		calculate_repulsion();
 	}
 
@@ -120,14 +120,16 @@ public:
 		return result > repulseDistance ? repulseDistance : result;
 	}
 
-	void calculate_repulsion(double pos[], double repulsion[]){
+	bool calculate_repulsion(double pos[], double repulsion[]){
+
+		bool repulsed = false;
 
 		for (int i = 0; i < replusePoints.size(); ++i){
 
 			double distance = distancePoints(pos[0], pos[1], replusePoints[i]);
 			
-			if (distance < attractionSpread){
-				double coefficent = attractionConst * (attractionSpread - distance);
+			if (distance < repulsionSpread){
+				double coefficent = repulsionConst * (repulsionSpread - distance);
 				double pointRepulsion[2];
 				double angle = angle_from_tank_to_point(pos, replusePoints[i]);
 				
@@ -137,7 +139,10 @@ public:
 				repulsion[0] += pointRepulsion[0];
 				repulsion[1] += pointRepulsion[1];
 			}
+			repulsed = true;
 		}
+
+		return repulsed;
 	}
 
 

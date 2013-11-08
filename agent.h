@@ -96,8 +96,14 @@ public:
 
 		// FOR POTENTIAL FIELDS LAB
 		double repulsion[2];// = {pfield->repulseArray[tankX][tankY].x,pfield->repulseArray[tankX][tankY].y};
-		pfield->calculate_repulsion(tank.pos, repulsion);
-		add_values(attraction, repulsion, pf);
+		bool repulsed = pfield->calculate_repulsion(tank.pos, repulsion);
+		if (repulsed){
+			add_values(attraction, repulsion, pf);
+		}
+		else{
+			pf[0] = attraction[0];
+			pf[1] = attraction[1];
+		}
 		return false;
 	}		
 

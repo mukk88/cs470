@@ -114,9 +114,9 @@ int main(int argc, char *argv[]) {
 
 	while(true){
 		for(int i=0;i<agents.size();i++){
-			sleep(1);
 			agents[i].move();
 		}
+		sleep(1);
 	}
 
 	delete myTeam;

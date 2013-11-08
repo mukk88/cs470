@@ -1,6 +1,7 @@
 #ifndef OBSTACLESEARCH_H
 #define OBSTACLESEARCH_H
 #include <vector>
+#include <iostream>
 #include <iterator>
 #include "occgrid.h"
 #include "agent.h"
@@ -51,8 +52,9 @@ public:
 		double pos[2];
 		pos[0] = get_tank().pos[0];
 		pos[1] = get_tank().pos[1];
-		/*if (distancePoints(pos, prevPos) < 3){
+		/*if (distancePoints(pos, prevPos) < .0001){
 			pfield->addPoint(pos);
+			cout << index << " is placing a replusion point" << endl;
 		}*/
 		prevPos[0] = pos[0];
 		prevPos[1] = pos[1];
