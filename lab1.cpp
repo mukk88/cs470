@@ -20,6 +20,8 @@ bool debugMode = false;
 
 int flagBearer = -1;
 
+
+//cmd : --default-true-positive=.97 --default-true-negative=.9 --occgrid-width=100 --no-report-obstacles
 // void dumbAgents(vector<int> numbots, BZRC& myTeam){
 // 	for(int i=0;i<numbots.size();i++){
 // 		myTeam.shoot(numbots[i]);
