@@ -75,13 +75,13 @@ public:
 				// p(si,j = occupied | oi,j) = p(oi,j | si,j = occupied)p(si,j = occupied) / p(oi,j)
 				double occupied_belief = 0;
 				double unoccupied_belief = 0;
-				if (grid.occupied(y, x)){
+				if (grid.occupied(j, i)){
 					occupied_belief = truePos * mainGrid->getValue(x,y);
-					unoccupied_belief = trueNeg * (1-mainGrid->getValue(x,y));
+					unoccupied_belief = (1-trueNeg) * (1-mainGrid->getValue(x,y));
 				}
 				else {
 					occupied_belief = (1-truePos) * mainGrid->getValue(x,y);
-					unoccupied_belief = (1-trueNeg) * (1-mainGrid->getValue(x,y));
+					unoccupied_belief = trueNeg * (1-mainGrid->getValue(x,y));
 				}
 
 				mainGrid->setValue(x,y, occupied_belief / (occupied_belief + unoccupied_belief));
