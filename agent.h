@@ -109,7 +109,7 @@ public:
 	}		
 
 	double ratioed(double diff){
-		return diff/(M_PI/2);
+		return diff/(2*M_PI);
 	}
 
 	double calculate_angvel(double target[]){

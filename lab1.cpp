@@ -102,14 +102,26 @@ int main(int argc, char *argv[]) {
 	// Grid* grid = new Grid(worldSize, worldSize, atof(constants.end()->value.c_str()), atof(constants.end()->value.c_str()));
 
 	vector<ObstacleSearchAgent> agents;
-	for(int i=2;i<6;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, true, grid);
+	for(int i=0;i<2;i++){
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, true, grid, true);
 		a.setGoal(-375, -375);
 		agents.push_back(a);
 	}
 	for(int i=2;i<4;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, false, grid);
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, false, grid, true);
 		a.setGoal(375, 375);
+		agents.push_back(a);
+	}
+	for(int i=4;i<6;i++){
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, false, grid, false);
+		a.makeHorizontalMower();
+		a.setGoal(-375, 375);
+		agents.push_back(a);
+	}
+	for(int i=6;i<8;i++){
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, true, grid, false);
+		a.makeHorizontalMower();
+		a.setGoal(375, -375);
 		agents.push_back(a);
 	}
 
@@ -119,13 +131,13 @@ int main(int argc, char *argv[]) {
 		for(int i=0;i<agents.size();i++){
 			agents[i].move();
 		}
-		if(counter<2){
+		if(counter<25){
 			counter++;
 		}else{
 			counter-=2;
 			grid->print();
 		}
-		sleep(0.1);
+		//sleep(0.1);
 	}
 
 	delete myTeam;

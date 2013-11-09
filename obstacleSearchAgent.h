@@ -15,9 +15,11 @@ class ObstacleSearchAgent : public Agent {
 public:
 
 	ObstacleSearchAgent(int index, BZRC* bzrc, PotentialField* p, string color, 
-		bool moveR, bool moveU, Grid* g): Agent(index, bzrc, p, color) {
+		bool moveR, bool moveU, Grid* g, bool moveVertFirst): Agent(index, bzrc, p, color) {
 
-		moveVertical = true;
+		moveVertical = moveVertFirst;
+		moveHorizDistance = 25;
+		moveVertDistance = 750;
 		moveUp = moveU;
 		moveRight = moveR;
 		mainGrid = g;
@@ -28,7 +30,13 @@ public:
 	~ObstacleSearchAgent() {
 	}
 
-	bool move(){
+	void makeHorizontalMower(){
+		int temp = moveHorizDistance;
+		moveHorizDistance = moveVertDistance;
+		moveVertDistance = temp;
+	}
+
+	virtual bool move(){
 		if (get_tank().status != "alive")
 			return false;
 
@@ -36,13 +44,14 @@ public:
 			missionAccomplished = false;
 			if (moveVertical){
 				moveVertical = false;
-				goal[1] += (moveUp) ? 750 : -750;
+				goal[1] += (moveVertDistance * ((moveUp) ? 1 : -1));
 				moveUp = !moveUp;
 			}
 			else { // move horizontal
-				goal[0] += (moveRight) ? 25 : -25;
+				goal[0] += (moveHorizDistance * ((moveRight) ? 1 : -1));
 				moveVertical = true;
 			}
+			cout << index << " reached goal new goal: " << goal[0] << ", " << goal[1]  << endl;
 		}
 		Agent::move(true);
 
@@ -61,7 +70,6 @@ public:
 	void observe(){
 		OccGrid* grid = new OccGrid();
 		bool success = commandCenter->get_occ(index, grid);
-		cout << grid->getXStart() << " "  << grid->getYStart() << " " << grid->getWidth() << " " << grid->getHeight() << get_tank().pos[0] << " " << get_tank().pos[1] << endl;
 		for (int i = 0; i < grid->getHeight(); ++i){
 			int y = grid->getYStart() + i;
 			for (int j = 0; j < grid->getWidth(); ++j){
@@ -96,7 +104,8 @@ private:
 	double prevPos[2];
 	double truePos;
 	double trueNeg;
-
+	int moveHorizDistance;
+	int moveVertDistance;
 };
 
 #endif
