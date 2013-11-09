@@ -7,25 +7,11 @@ using namespace std;
 
 class OccGrid{
 public:
-	OccGrid(){
+	OccGrid() : occupancy(NULL), index(0)  {
 		
 	}
 
-	OccGrid(int x, int y, int w, int h) : 
-		xStart(x), yStart (y), width(w), height(h), index(0)  {
-		occupancy = new bool*[height];
-		for(int i = 0; i < height; ++i) {
-		    occupancy[i] = new bool[width];
-		}
-	}
-
 	void updateGrid(int x, int y, int w, int h){
-
-		for(int i = 0; i < height; ++i) {
-		    delete [] occupancy[i];
-		}
-		delete [] occupancy;
-
 		height = h;
 		xStart = x;
 		yStart = y;
@@ -37,10 +23,12 @@ public:
 	}
 
 	~OccGrid() {
-		for(int i = 0; i < height; ++i) {
-		    delete [] occupancy[i];
+		if (occupancy != NULL){
+			for(int i = 0; i < height; ++i) {
+			    delete [] occupancy[i];
+			}
+			delete [] occupancy;
 		}
-		delete [] occupancy;
 	}
 
 	void addLine(string line){

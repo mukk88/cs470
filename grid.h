@@ -33,11 +33,33 @@ public:
 	}
 
 	void setValue(int x, int y, double value){
-		grid[y+400][x+400] = value;
+		if (x >= 400 && y >= 400){
+			grid[y+399][x+399] = value;
+		}
+		if (x >= 400){
+			grid[y+400][x+399] = value;
+		}
+		else if (y >= 400){
+			grid[y+399][x+400] = value;
+		}
+		else {
+			grid[y+400][x+400] = value;
+		}
 	}
 
 	double getValue(int x, int y){
-		return grid[y+400][x+400];
+		if (x >= 400 && y >= 400){
+			return grid[y+399][x+399];
+		}
+		if (x >= 400){
+			return grid[y+400][x+399];
+		}
+		else if (y >= 400){
+			return grid[y+399][x+400];
+		}
+		else {
+			return grid[y+400][x+400];
+		}
 	}
 
 	double getTruePos() {return truePos;}

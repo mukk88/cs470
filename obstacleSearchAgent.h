@@ -59,7 +59,7 @@ public:
 	}
 
 	void observe(){
-		OccGrid* grid = new OccGrid(1,1,1,1);
+		OccGrid* grid = new OccGrid();
 		bool success = commandCenter->get_occ(index, grid);
 		cout << grid->getXStart() << " "  << grid->getYStart() << " " << grid->getWidth() << " " << grid->getHeight() << get_tank().pos[0] << " " << get_tank().pos[1] << endl;
 		for (int i = 0; i < grid->getHeight(); ++i){

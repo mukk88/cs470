@@ -469,22 +469,24 @@ public:
 		//the at value
 		v=ReadArr();
 		vector<string> at = splitbyChar(v[1], ',');
-		int startx = atoi(at[0].c_str());
-		int starty = atoi(at[1].c_str());
+		int starty = atoi(at[0].c_str());
+		int startx = atoi(at[1].c_str());
 		v.clear();
 		v=ReadArr();
 		vector<string> result = splitbyChar(v[1],'x');
 		int h = atoi(result[0].c_str());
 		int w = atoi(result[1].c_str());
+		grid->updateGrid(startx, starty, w, h);
+
 		for(int i=0;i<h;i++){
 			v=ReadArr();
+			grid->addLine(v[0]);
 			v.clear();
 		}
 		v=ReadArr();
 		if(v[0]!="end"){
 			return false;
 		}
-		grid->updateGrid(startx, starty, h, w);
 		return true;
 	}
 
