@@ -63,7 +63,7 @@ def readfile(g):
             line = f.readline()
             arr = line.split()
             for j in range(width):
-                g[i][j] = arr[j]
+                g[j][i] = arr[j]
         end = f.readline().strip()
         if end == 'end':
             return True
@@ -88,4 +88,4 @@ if __name__ == '__main__':
         print 'updating'       
         update_grid(grid2)
         draw_grid()
-        time.sleep(1)
+        time.sleep(3)

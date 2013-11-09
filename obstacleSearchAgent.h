@@ -51,20 +51,12 @@ public:
 				goal[0] += (moveHorizDistance * ((moveRight) ? 1 : -1));
 				moveVertical = true;
 			}
-			cout << index << " reached goal new goal: " << goal[0] << ", " << goal[1]  << endl;
 		}
 		Agent::move(true);
 
-		double pos[2];
-		pos[0] = get_tank().pos[0];
-		pos[1] = get_tank().pos[1];
-		// if (distancePoints(pos, prevPos) < .0001){
-		// 	pfield->addPoint(pos);
-		// 	cout << index << " is placing a replusion point at " << pos[0] << ", " << pos[1] << endl;
-		// }
 		observe();
-		prevPos[0] = pos[0];
-		prevPos[1] = pos[1];
+
+
 	}
 
 	void observe(){

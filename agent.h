@@ -89,22 +89,22 @@ public:
 		tank_t tank = get_tank();
 		double attraction[2];
 		calculate_attraction(tank.pos, attraction);
-		if (attraction[0] == 0 && attraction[1] == 0)
-			return true;
+		// if (attraction[0] == 0 && attraction[1] == 0)
+		// 	return true;
 
-		int tankX = (tank.pos[0] + 400)/2;
-		int tankY = (tank.pos[1] + 400)/2;
+		// int tankX = (tank.pos[0] + 400)/2;
+		// int tankY = (tank.pos[1] + 400)/2;
 
-		// FOR POTENTIAL FIELDS LAB
-		double repulsion[2];// = {pfield->repulseArray[tankX][tankY].x,pfield->repulseArray[tankX][tankY].y};
-		bool repulsed = pfield->calculate_repulsion(tank.pos, repulsion);
-		if (repulsed){
-			add_values(attraction, repulsion, pf);
-		}
-		else{
+		// // FOR POTENTIAL FIELDS LAB
+		// double repulsion[2];// = {pfield->repulseArray[tankX][tankY].x,pfield->repulseArray[tankX][tankY].y};
+		// bool repulsed = pfield->calculate_repulsion(tank.pos, repulsion);
+		// if (repulsed){
+		// 	add_values(attraction, repulsion, pf);
+		// }
+		// else{
 			pf[0] = attraction[0];
 			pf[1] = attraction[1];
-		}
+		// }
 		return false;
 	}		
 
@@ -128,7 +128,6 @@ public:
 	virtual bool move(bool shootBullet){
 		if (get_tank().status != "alive")
 			return false;
-		
 		//setGoal
 		if(reached_goal()){
 			/*goal[0] = home[0];
@@ -148,13 +147,7 @@ public:
 		commandCenter->speed(index, velocity);
 
 		// if (shootBullet)
-		// 	commandCenter->shoot(index);
-
-		/*if(get_tank().flag!="-"){
-			return true;
-		}else{
-			return false;
-		}*/
+			commandCenter->shoot(index);
 		return missionAccomplished;
 	}
 

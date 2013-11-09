@@ -9,6 +9,7 @@
 #include "agent.h"
 #include "potentialfield.h"
 #include "obstacleSearchAgent.h"
+#include "randomAgent.h"
 
 #include "occgrid.h"
 
@@ -102,28 +103,31 @@ int main(int argc, char *argv[]) {
 	// Grid* grid = new Grid(worldSize, worldSize, atof(constants.end()->value.c_str()), atof(constants.end()->value.c_str()));
 
 	vector<ObstacleSearchAgent> agents;
-	for(int i=0;i<2;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, true, grid, true);
-		a.setGoal(-375, -375);
-		agents.push_back(a);
+
+	ObstacleSearchAgent a = ObstacleSearchAgent(0, myTeam, pfield, "green", true, true, grid, true);
+	a.setGoal(-375, -375);
+	agents.push_back(a);
+	a = ObstacleSearchAgent(1, myTeam, pfield, "green", false, false, grid, true);
+	a.setGoal(375, 375);
+	agents.push_back(a);
+	a = ObstacleSearchAgent(2, myTeam, pfield, "green", true, false, grid, false);
+	a.makeHorizontalMower();
+	a.setGoal(-375, 375);
+	agents.push_back(a);
+
+	a = ObstacleSearchAgent(3, myTeam, pfield, "green", false, true, grid, false);
+	a.makeHorizontalMower();
+	a.setGoal(375, -375);
+	agents.push_back(a);
+	
+
+	vector<RandomObstacleSearchAgent> randomagents;
+	for(int i=4;i<10;i++){
+		RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, myTeam, pfield, "green", grid);
+		randomagents.push_back(a);
+
 	}
-	for(int i=2;i<4;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, false, grid, true);
-		a.setGoal(375, 375);
-		agents.push_back(a);
-	}
-	for(int i=4;i<6;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, false, grid, false);
-		a.makeHorizontalMower();
-		a.setGoal(-375, 375);
-		agents.push_back(a);
-	}
-	for(int i=6;i<8;i++){
-		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, true, grid, false);
-		a.makeHorizontalMower();
-		a.setGoal(375, -375);
-		agents.push_back(a);
-	}
+	
 
 	int counter = 0;
 
@@ -131,13 +135,16 @@ int main(int argc, char *argv[]) {
 		for(int i=0;i<agents.size();i++){
 			agents[i].move();
 		}
-		if(counter<25){
+		for(int i=0;i<randomagents.size();i++){
+			randomagents[i].randomMove();
+		}
+		if(counter<2){
 			counter++;
 		}else{
 			counter-=2;
+			cout << "writing" << endl;
 			grid->print();
 		}
-		//sleep(0.1);
 	}
 
 	delete myTeam;
