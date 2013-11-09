@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "bot.h"
+#include "command.h"
 
 using namespace std;
 
@@ -54,11 +54,11 @@ void printPotentials(ofstream& outfile, BZRC& myTeam){
 			start.y = j*2-400;
 			end.x = start.x + repulsion[i][j].x;
 			end.y = start.y + repulsion[i][j].y;
-			double curLoc[2] = {start.x, start.y};
-			double deltas[2];
-			myTeam.calculate_attraction(curLoc, deltas);
-			end.x += deltas[0];
-			end.y += deltas[1];
+			// double curLoc[2] = {start.x, start.y};
+			// double deltas[2];
+			// myTeam.calculate_attraction(curLoc, deltas);
+			// end.x += deltas[0];
+			// end.y += deltas[1];
 			printLine(start,end, outfile);
 		}
 	}

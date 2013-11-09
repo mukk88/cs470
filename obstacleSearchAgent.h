@@ -21,18 +21,11 @@ public:
 		moveUp = moveU;
 		moveRight = moveR;
 		mainGrid = g;
-
+		truePos = g->getTruePos();
+		trueNeg = g->getTrueNeg();
 	}
 
 	~ObstacleSearchAgent() {
-	}
-
-	void setTruePositive(double truePositive){
-		truePos = truePositive;
-	}
-
-	void setTrueNegative(double trueNegative){
-		trueNeg = trueNegative;
 	}
 
 	bool move(){
@@ -56,26 +49,29 @@ public:
 		double pos[2];
 		pos[0] = get_tank().pos[0];
 		pos[1] = get_tank().pos[1];
-		if (distancePoints(pos, prevPos) < .0001){
-			pfield->addPoint(pos);
-			cout << index << " is placing a replusion point at " << pos[0] << ", " << pos[1] << endl;
-		}
+		// if (distancePoints(pos, prevPos) < .0001){
+		// 	pfield->addPoint(pos);
+		// 	cout << index << " is placing a replusion point at " << pos[0] << ", " << pos[1] << endl;
+		// }
+		observe();
 		prevPos[0] = pos[0];
 		prevPos[1] = pos[1];
 	}
 
 	void observe(){
-		OccGrid grid;
-		commandCenter->get_occ(index, grid);
-		for (int i = 0; i < grid.getHeight(); ++i){
-			int y = grid.getYStart() + i;
-			for (int j = 0; j < grid.getWidth(); ++j){
-				int x = grid.getXStart() + j;
+		OccGrid* grid = new OccGrid(1,1,1,1);
+		bool success = commandCenter->get_occ(index, grid);
+		cout << grid->getXStart() << " "  << grid->getYStart() << " " << grid->getWidth() << " " << grid->getHeight() << get_tank().pos[0] << " " << get_tank().pos[1] << endl;
+		for (int i = 0; i < grid->getHeight(); ++i){
+			int y = grid->getYStart() + i;
+			for (int j = 0; j < grid->getWidth(); ++j){
+				int x = grid->getXStart() + j;
 
 				// p(si,j = occupied | oi,j) = p(oi,j | si,j = occupied)p(si,j = occupied) / p(oi,j)
+
 				double occupied_belief = 0;
 				double unoccupied_belief = 0;
-				if (grid.occupied(j, i)){
+				if (grid->occupied(i, j)){
 					occupied_belief = truePos * mainGrid->getValue(x,y);
 					unoccupied_belief = (1-trueNeg) * (1-mainGrid->getValue(x,y));
 				}
@@ -87,6 +83,7 @@ public:
 				mainGrid->setValue(x,y, occupied_belief / (occupied_belief + unoccupied_belief));
 			}
 		}
+		delete grid;
 	}
 
 private:

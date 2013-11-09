@@ -14,7 +14,7 @@ import sys
 import threading
 import random
 
-class Hello(threading.Thread):
+class cCode(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
 
@@ -56,31 +56,36 @@ def init_window(width, height):
 def readfile(g):
     try:
         f = open('output.txt', 'r')
-
-        for i in range(800):
+        dim = f.readline().strip()
+        height = int(dim.split()[0])
+        width = int(dim.split()[1])
+        for i in range(height):
             line = f.readline()
             arr = line.split()
-            for j in range(800):
+            for j in range(width):
                 g[i][j] = arr[j]
         end = f.readline().strip()
-        return True
+        if end == 'end':
+            return True
+        else:
+            return False
     except:
         return False
 
 if __name__ == '__main__':
 
-    # h = Hello()
-    # h.start()
+    # t = cCode()
+    # t.start()
     # time.sleep(0.5)
 
     init_window(800,800)
     grid2 = ones((800,800))
 
     while True:
-        # read the file and populate the grid
         read = False
         while not read:
-            read = readfile(grid2)            
+            read = readfile(grid2)     
+        print 'updating'       
         update_grid(grid2)
         draw_grid()
         time.sleep(1)

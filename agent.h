@@ -147,8 +147,8 @@ public:
 		double velocity = calculate_speed(pf);
 		commandCenter->speed(index, velocity);
 
-		if (shootBullet)
-			commandCenter->shoot(index);
+		// if (shootBullet)
+		// 	commandCenter->shoot(index);
 
 		/*if(get_tank().flag!="-"){
 			return true;

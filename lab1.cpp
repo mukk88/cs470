@@ -87,9 +87,6 @@ int main(int argc, char *argv[]) {
 	BZRC* myTeam = new BZRC(pcHost, port, false);
 	PotentialField* pfield = new PotentialField(myTeam);
 
-	OccGrid o;
-	myTeam->get_occ(1, o);
-
 	// retrieve constants
 	vector<constant_t> constants;
 	if (!myTeam->get_constants(&constants)){
@@ -98,25 +95,35 @@ int main(int argc, char *argv[]) {
 	}
 
 	int worldSize = atoi(constants[1].value.c_str());
-	Grid* grid = new Grid(worldSize, worldSize);
+	cout << worldSize << endl;
+	Grid* grid = new Grid(worldSize, worldSize, 0.99, 0.98);
+	// Grid* grid = new Grid(worldSize, worldSize, atof(constants.end()->value.c_str()), atof(constants.end()->value.c_str()));
 
 	vector<ObstacleSearchAgent> agents;
-	for(int i=0;i<2;i++){
+	for(int i=2;i<6;i++){
 		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", true, true, grid);
 		a.setGoal(-375, -375);
 		agents.push_back(a);
 	}
-	// for(int i=2;i<4;i++){
-	// 	ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, false, grid);
-	// 	a.setGoal(375, 375);
-	// 	agents.push_back(a);
-	// }
+	for(int i=2;i<4;i++){
+		ObstacleSearchAgent a = ObstacleSearchAgent(i, myTeam, pfield, "green", false, false, grid);
+		a.setGoal(375, 375);
+		agents.push_back(a);
+	}
+
+	int counter = 0;
 
 	while(true){
 		for(int i=0;i<agents.size();i++){
 			agents[i].move();
 		}
-		sleep(1);
+		if(counter<2){
+			counter++;
+		}else{
+			counter-=2;
+			grid->print();
+		}
+		sleep(0.1);
 	}
 
 	delete myTeam;

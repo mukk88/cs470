@@ -455,11 +455,10 @@ public:
 		return true;
 	}
 
-	bool get_occ(int i, OccGrid& grid){
+	bool get_occ(int i, OccGrid* grid){
 		stringstream ss;
 		ss << i;
 		string command = "occgrid " + ss.str();
-		cout << command << endl;
 		SendLine(command.c_str());
 		ReadAck();
 		vector <string> v=ReadArr();
@@ -485,7 +484,7 @@ public:
 		if(v[0]!="end"){
 			return false;
 		}
-		grid = OccGrid(startx, starty, w, h);
+		grid->updateGrid(startx, starty, h, w);
 		return true;
 	}
 

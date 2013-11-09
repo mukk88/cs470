@@ -19,6 +19,23 @@ public:
 		}
 	}
 
+	void updateGrid(int x, int y, int w, int h){
+
+		for(int i = 0; i < height; ++i) {
+		    delete [] occupancy[i];
+		}
+		delete [] occupancy;
+
+		height = h;
+		xStart = x;
+		yStart = y;
+		width = w;
+		occupancy = new bool*[height];
+		for(int i = 0; i < height; ++i) {
+		    occupancy[i] = new bool[width];
+		}
+	}
+
 	~OccGrid() {
 		for(int i = 0; i < height; ++i) {
 		    delete [] occupancy[i];
@@ -34,6 +51,8 @@ public:
 		}
 		++index;
 	}
+
+	void setXStart(int x) { xStart = x;}
 
 	int getXStart() { return xStart; }
 	int getYStart() { return yStart; }
