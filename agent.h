@@ -90,6 +90,7 @@ public:
 		tank_t tank = get_tank();
 		double attraction[2];
 		calculate_attraction(tank.pos, attraction);
+
 		// if (attraction[0] == 0 && attraction[1] == 0)
 		// 	return true;
 
