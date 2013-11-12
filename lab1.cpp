@@ -21,60 +21,30 @@ bool debugMode = false;
 
 int flagBearer = -1;
 
-
 //cmd : --default-true-positive=.97 --default-true-negative=.9 --occgrid-width=100 --no-report-obstacles
-// void dumbAgents(vector<int> numbots, BZRC& myTeam){
-// 	for(int i=0;i<numbots.size();i++){
-// 		myTeam.shoot(numbots[i]);
-// 		myTeam.speed(numbots[i],10);
-// 	}
-// 	sleep(2);
-// 	for(int i=0;i<numbots.size();i++){
-// 		myTeam.shoot(numbots[i]);
-// 	}
-// 	sleep(2);
-// 	for(int i=0;i<numbots.size();i++){
-// 		myTeam.speed(numbots[i], 0);
-// 		myTeam.shoot(numbots[i]);
-// 		myTeam.angvel(numbots[i], 0.5);
-// 	}
-// 	sleep(2);
-// 	for(int i=0;i<numbots.size();i++){
-// 		myTeam.shoot(numbots[i]);
-// 	}
-// 	sleep(2);
-// 	for(int i=0;i<numbots.size();i++){
-// 		myTeam.angvel(numbots[i], 0);
-// 	}
-// }
-
-// void pfAgents(vector<int> numbots, BZRC& myTeam, bool shoot = false){
-// 	bool goal = false;
-// 	if(flagBearer!=-1){
-// 		if(!myTeam.pf_move(flagBearer, shoot)){
-// 			flagBearer = -1;
-// 		}
-// 	}
-// 	else{
-// 		for(int i=0;i<numbots.size();i++){
-// 			if(myTeam.pf_move(numbots[i], shoot)){
-// 				flagBearer = numbots[i];
-// 			}
-// 		}
-// 	}
-// 	sleep(1);
-// }
 
 int main(int argc, char *argv[]) {
 	const char *pcHost = "127.0.0.1";
-	int port = 4000;
+	int portpurple = 0;
+	int portgreen = 0;
+	int portblue = 0;
+	int portred = 0;
 	int option;
 
-	while ((option = getopt(argc,argv,"s:p:d")) != -1) {
+	while ((option = getopt(argc,argv,"s:p:g:b:r:d")) != -1) {
         switch (option) {
             case 'p':
-                port = atoi(optarg);
+                portpurple = atoi(optarg);
                 break;
+            case 'g':
+            	portgreen = atoi(optarg);
+            	break;
+            case 'b':
+            	portblue = atoi(optarg);
+            	break;
+            case 'r':
+            	portred = atoi(optarg);
+            	break;	
             case 's':
                 pcHost = optarg;
                 break;
@@ -82,72 +52,111 @@ int main(int argc, char *argv[]) {
             	debugMode = true;
             	break;
             default:
-                cout << "client [-s IP address] [-p port]" << endl;
+                cout << "client [-s IP address] [-c port], where c is the first char of the color" << endl;
                 exit(EXIT_FAILURE);
         }
     }
+    BZRC* blue = NULL;
+    BZRC* red = NULL;
+    BZRC* purple = NULL;
+    BZRC* green = NULL;
+    if(portred)
+    	red = new BZRC(pcHost, portred, false);
+    if(portpurple)
+    	purple = new BZRC(pcHost, portpurple, false);
+    if(portblue)
+    	blue = new BZRC(pcHost, portblue, false);
+    if(portgreen)
+    	green = new BZRC(pcHost, portgreen, false);
 
-	BZRC* myTeam = new BZRC(pcHost, port, false);
-	PotentialField* pfield = new PotentialField(myTeam);
+	PotentialField* pfield = new PotentialField(purple);
 
-	// retrieve constants
+	// retrieve constants, assume there is purple for now
 	vector<constant_t> constants;
-	if (!myTeam->get_constants(&constants)){
+	if (!purple||!purple->get_constants(&constants)){
 		cerr << "unable to retrieve constants" << endl;
 		return -1;
 	}
 
 	int worldSize = atoi(constants[1].value.c_str());
-	cout << worldSize << endl;
-	Grid* grid = new Grid(worldSize, worldSize, 0.99, 0.98);
-	// Grid* grid = new Grid(worldSize, worldSize, atof(constants.end()->value.c_str()), atof(constants.end()->value.c_str()));
+	Grid* grid = new Grid(worldSize, worldSize, atof(constants[16].value.c_str()), atof(constants[17].value.c_str()));
 
 	vector<ObstacleSearchAgent> agents;
 
-	ObstacleSearchAgent a = ObstacleSearchAgent(0, myTeam, pfield, "green", true, true, grid, true);
+	ObstacleSearchAgent a = ObstacleSearchAgent(0, purple, pfield, "green", true, true, grid, true);
 	a.setGoal(-375, -375);
 	agents.push_back(a);
-	a = ObstacleSearchAgent(1, myTeam, pfield, "green", false, false, grid, true);
+	a = ObstacleSearchAgent(1, purple, pfield, "green", false, false, grid, true);
 	a.setGoal(375, 375);
 	agents.push_back(a);
-	a = ObstacleSearchAgent(2, myTeam, pfield, "green", true, false, grid, false);
+	a = ObstacleSearchAgent(2, purple, pfield, "green", true, false, grid, false);
 	a.makeHorizontalMower();
 	a.setGoal(-375, 375);
 	agents.push_back(a);
 
-	a = ObstacleSearchAgent(3, myTeam, pfield, "green", false, true, grid, false);
+	a = ObstacleSearchAgent(3, purple, pfield, "green", false, true, grid, false);
 	a.makeHorizontalMower();
 	a.setGoal(375, -375);
 	agents.push_back(a);
 	
 
-	vector<RandomObstacleSearchAgent> randomagents;
+	vector<RandomObstacleSearchAgent> purpleagents;
 	for(int i=4;i<10;i++){
-		RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, myTeam, pfield, "green", grid);
-		randomagents.push_back(a);
-
+		RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, purple, pfield, "green", grid);
+		// a.setGoal(worldSize*(i+1)/5-worldSize/2, worldSize/5);
+		purpleagents.push_back(a);
 	}
 	
+	vector<RandomObstacleSearchAgent> greenagents;
+	if(green)
+		for(int i=0;i<8;i++){
+			RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, green, pfield, "green", grid);
+			// a.setGoal(worldSize*(i+1)/8-worldSize/2, worldSize/12);
+			greenagents.push_back(a);
+		}
+	vector<RandomObstacleSearchAgent> redagents;
+	if(red)
+		for(int i=0;i<8;i++){
+			RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, red, pfield, "green", grid);
+			// a.setGoal(worldSize*(i+1)/8-worldSize/2, -worldSize/12);
+			redagents.push_back(a);
+		}
+	vector<RandomObstacleSearchAgent> blueagents;
+	if(blue)
+		for(int i=0;i<8;i++){
+			RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, blue, pfield, "green", grid);
+			// a.setGoal(worldSize*(i+1)/8-worldSize/2, -worldSize/5);
+			blueagents.push_back(a);
+		}
+
+	vector< vector<RandomObstacleSearchAgent> > randomagents;
+	randomagents.push_back(purpleagents);
+	randomagents.push_back(blueagents);
+	randomagents.push_back(greenagents);
+	randomagents.push_back(redagents);
 
 	int counter = 0;
 
 	while(true){
-		for(int i=0;i<agents.size();i++){
-			agents[i].move();
-		}
 		for(int i=0;i<randomagents.size();i++){
-			randomagents[i].randomMove();
-		}
-		if(counter<2){
-			counter++;
-		}else{
-			counter-=2;
-			cout << "writing" << endl;
+			for(int j=0;j<agents.size();j++){
+				agents[j].move();
+			}
+			grid->print();
+			for(int j=0;j<randomagents[i].size();j++){
+				randomagents[i][j].randomMove();
+			}
 			grid->print();
 		}
 	}
 
-	delete myTeam;
+	delete purple;
+	if(red)
+		delete red;
+	if(blue)
+		delete blue;
+	if(green)
+		delete green;
 	delete pfield;
 	delete grid;
 	cout << "done" << endl;

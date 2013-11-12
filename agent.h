@@ -23,6 +23,7 @@ public:
 		commandCenter->get_mytanks(myTanks);
 		goalName = color;
 		missionAccomplished = false;
+		commandCenter->speed(i, 1);
 	}
 
 	~Agent(){
@@ -143,11 +144,11 @@ public:
 
 		double angularvel = calculate_angvel(pf);
 		commandCenter->angvel(index, angularvel);
-		double velocity = calculate_speed(pf);
-		commandCenter->speed(index, velocity);
+		// double velocity = calculate_speed(pf);
+		// commandCenter->speed(index, velocity);
 
 		// if (shootBullet)
-			commandCenter->shoot(index);
+			// commandCenter->shoot(index);
 		return missionAccomplished;
 	}
 
