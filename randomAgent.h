@@ -15,7 +15,7 @@ public:
 		Grid* g) : ObstacleSearchAgent(index, bzrc, p, color, 0,0,g,0){
 		counter = 0;
 		srand(time(NULL));
-		// updateGoal();
+		//updateGoal();
 	}
 
 	bool randomMove(){
@@ -28,9 +28,9 @@ public:
 			updateGoal();
 		}
 		// cout << "called " << counter << endl;
-		if(counter > 20){
+		if(counter > 5){
 			updateGoal();
-			counter-=20;
+			counter-=5;
 		}
 		Agent::move(false);
 		ObstacleSearchAgent::observe();

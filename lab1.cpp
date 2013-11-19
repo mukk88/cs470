@@ -83,49 +83,67 @@ int main(int argc, char *argv[]) {
 
 	vector<ObstacleSearchAgent> agents;
 
-	ObstacleSearchAgent a = ObstacleSearchAgent(0, purple, pfield, "green", true, true, grid, true);
+	ObstacleSearchAgent a = ObstacleSearchAgent(9, red, pfield, "green", true, true, grid, true);
 	a.setGoal(-375, -375);
 	agents.push_back(a);
-	a = ObstacleSearchAgent(1, purple, pfield, "green", false, false, grid, true);
+	a = ObstacleSearchAgent(9, green, pfield, "green", false, false, grid, true);
 	a.setGoal(375, 375);
 	agents.push_back(a);
-	a = ObstacleSearchAgent(2, purple, pfield, "green", true, false, grid, false);
+	a = ObstacleSearchAgent(9, blue, pfield, "green", true, false, grid, false);
 	a.makeHorizontalMower();
 	a.setGoal(-375, 375);
 	agents.push_back(a);
 
-	a = ObstacleSearchAgent(3, purple, pfield, "green", false, true, grid, false);
+	a = ObstacleSearchAgent(9, purple, pfield, "green", false, true, grid, false);
 	a.makeHorizontalMower();
 	a.setGoal(375, -375);
 	agents.push_back(a);
 	
 
 	vector<RandomObstacleSearchAgent> purpleagents;
-	for(int i=4;i<10;i++){
+	for(int i=0;i<2;i++){
 		RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, purple, pfield, "green", grid);
-		// a.setGoal(worldSize*(i+1)/5-worldSize/2, worldSize/5);
+			if (i == 0)
+				a.setGoal(0, 0);
+			else
+				a.setGoal(worldSize/4, -worldSize/4);
 		purpleagents.push_back(a);
+	}
+	for (int i = 2; i < 9; i++){
+		purple->speed(i, 1);
+		blue->speed(i, 1);
+		green->speed(i, 1);
+		red->speed(i, 1);
 	}
 	
 	vector<RandomObstacleSearchAgent> greenagents;
 	if(green)
-		for(int i=0;i<8;i++){
+		for(int i=0;i<2;i++){
 			RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, green, pfield, "green", grid);
-			// a.setGoal(worldSize*(i+1)/8-worldSize/2, worldSize/12);
+			if (i == 0)
+				a.setGoal(0, 0);
+			else
+				a.setGoal(worldSize/4, worldSize/4);
 			greenagents.push_back(a);
 		}
 	vector<RandomObstacleSearchAgent> redagents;
 	if(red)
-		for(int i=0;i<8;i++){
+		for(int i=0;i<2;i++){
 			RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, red, pfield, "green", grid);
-			// a.setGoal(worldSize*(i+1)/8-worldSize/2, -worldSize/12);
+			if (i == 0)
+				a.setGoal(0, 0);
+			else
+				a.setGoal(-worldSize/4, -worldSize/4);
 			redagents.push_back(a);
 		}
 	vector<RandomObstacleSearchAgent> blueagents;
 	if(blue)
-		for(int i=0;i<8;i++){
+		for(int i=0;i<2;i++){
 			RandomObstacleSearchAgent a = RandomObstacleSearchAgent(i, blue, pfield, "green", grid);
-			// a.setGoal(worldSize*(i+1)/8-worldSize/2, -worldSize/5);
+			if (i == 0)
+				a.setGoal(0, 0);
+			else
+				a.setGoal(-worldSize/4, worldSize/4);
 			blueagents.push_back(a);
 		}
 

@@ -111,7 +111,7 @@ public:
 	}		
 
 	double ratioed(double diff){
-		return diff/(2*M_PI);
+		return diff/(M_PI);
 	}
 
 	double calculate_angvel(double target[]){
@@ -146,10 +146,10 @@ public:
 		double angularvel = calculate_angvel(pf);
 		commandCenter->angvel(index, angularvel);
 		// double velocity = calculate_speed(pf);
-		// commandCenter->speed(index, velocity);
+		commandCenter->speed(index, 1);
 
 		// if (shootBullet)
-			// commandCenter->shoot(index);
+			//commandCenter->shoot(index);
 		return missionAccomplished;
 	}
 
