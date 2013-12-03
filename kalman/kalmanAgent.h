@@ -82,7 +82,7 @@ public:
 		updateError(Ktplus1);
 
 		ofstream myfile;
-		string fileName = "values-" + color + ".txt";
+		string fileName = "values-" + color + ".dat";
 		myfile.open (fileName.c_str());
 		//row sigmax sigmay x y
 		myfile << 0 << " " << Sigmat(0,0) << " " << Sigmat(3,3) << " " << 
