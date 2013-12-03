@@ -7,6 +7,8 @@
 #include <Eigen/Dense>
 #include <string>
 #include <iterator>
+#include <fstream>
+#include <iostream>
 
 using Eigen::MatrixXd;
 
@@ -78,6 +80,14 @@ public:
 		MatrixXd Ktplus1 = GetKtplus1();
 		updateMean(Ktplus1, z);
 		updateError(Ktplus1);
+
+		ofstream myfile;
+		string fileName = "values-" + color + ".txt";
+		myfile.open (fileName.c_str());
+		//row sigmax sigmay x y
+		myfile << 0 << " " << Sigmat(0,0) << " " << Sigmat(3,3) << " " << 
+			u(0,0) << " " << u(3,0);
+		myfile.close();
 	}
 
 	void updateMean(MatrixXd Ktplus1, MatrixXd z){
@@ -87,7 +97,8 @@ public:
 
 	void updateError(MatrixXd Ktplus1){
 		//Σt + 1 = (I − Kt + 1H)(FΣtFT + Σx) 
-		Sigmat = (Eigen::Matrix<double, 6, 6>::Identity() - Ktplus1*H)*(F*Sigmat*Ftranspose + Sigmax);
+		Sigmat = (Eigen::Matrix<double, 6, 6>::Identity() - 
+			Ktplus1*H)*(F*Sigmat*Ftranspose + Sigmax);
 	}
 
 private:
