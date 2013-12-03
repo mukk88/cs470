@@ -1,11 +1,11 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #include <iostream>
-#include <algorithm>
-#include <iterator>
 #include <unistd.h>
 #include <ctype.h>
 #include <vector>
 #include "command.h"
+#include "kalmanAgent.h"
+#include "randomAgent.h"
 
 using namespace std;
 
@@ -54,7 +54,19 @@ int main(int argc, char *argv[]) {
     if(portgreen)
     	green = new BZRC(pcHost, portgreen, false);
 
-    green->speed(0,0.5);
+    green->speed(0,0.1);
+    RandomAgent random(0, blue, 10);
+    KalmanAgent kalmanGreen(0, purple, .5, .1, "green");
+    KalmanAgent kalmanBlue(0, purple, .5, .1, "blue");
+    KalmanAgent kalmanRed(0, purple, .5, .1, "red");
+
+    while (true){
+        sleep(.5);
+        random.move();
+        kalmanGreen.update();
+        kalmanBlue.update();
+        kalmanRed.update();
+    }
 
     if(purple)
         delete purple;

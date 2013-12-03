@@ -17,7 +17,7 @@ public:
 	void move(){
 		if (ticker++ > changeCycles){
 			commandCenter->speed(index, randomNumber());
-			commandCenter->speed(index, randomNumber());
+			commandCenter->angvel(index, randomNumber());
 			ticker = 0;
 		}
 	}
@@ -28,7 +28,7 @@ private:
 	int ticker;
 	const int changeCycles;
 
-	void randomNumber(){
+	double randomNumber(){
 		return (double (rand() % 1000)) / (1000.0);
 	}
 };
