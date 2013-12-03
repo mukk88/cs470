@@ -10,7 +10,7 @@
 #include "potentialfield.h"
 #include "obstacleSearchAgent.h"
 #include "randomAgent.h"
-
+#include "kalmanAgent.h"
 #include "occgrid.h"
 
 using namespace std;
@@ -22,56 +22,10 @@ bool debugMode = false;
 int flagBearer = -1;
 
 //cmd : --default-true-positive=.97 --default-true-negative=.9 --occgrid-width=100 --no-report-obstacles
+//cmd: ./bin/bzrflag --world=maps/blank.bzw --blue-tanks=1 --red-tanks=1 --green-tanks=1 --purple-tanks=1 --default-posnoise=5
 
-int main(int argc, char *argv[]) {
-	const char *pcHost = "127.0.0.1";
-	int portpurple = 0;
-	int portgreen = 0;
-	int portblue = 0;
-	int portred = 0;
-	int option;
-
-	while ((option = getopt(argc,argv,"s:p:g:b:r:d")) != -1) {
-        switch (option) {
-            case 'p':
-                portpurple = atoi(optarg);
-                break;
-            case 'g':
-            	portgreen = atoi(optarg);
-            	break;
-            case 'b':
-            	portblue = atoi(optarg);
-            	break;
-            case 'r':
-            	portred = atoi(optarg);
-            	break;	
-            case 's':
-                pcHost = optarg;
-                break;
-            case 'd':
-            	debugMode = true;
-            	break;
-            default:
-                cout << "client [-s IP address] [-c port], where c is the first char of the color" << endl;
-                exit(EXIT_FAILURE);
-        }
-    }
-    BZRC* blue = NULL;
-    BZRC* red = NULL;
-    BZRC* purple = NULL;
-    BZRC* green = NULL;
-    if(portred)
-    	red = new BZRC(pcHost, portred, false);
-    if(portpurple)
-    	purple = new BZRC(pcHost, portpurple, false);
-    if(portblue)
-    	blue = new BZRC(pcHost, portblue, false);
-    if(portgreen)
-    	green = new BZRC(pcHost, portgreen, false);
-
-	PotentialField* pfield = new PotentialField(purple);
-
-	// retrieve constants, assume there is purple for now
+int grid_filter_lab(BZRC* purple, BZRC* red, BZRC* blue, BZRC* green, PotentialField* pfield){
+	//retrieve constants, assume there is purple for now
 	vector<constant_t> constants;
 	if (!purple||!purple->get_constants(&constants)){
 		cerr << "unable to retrieve constants" << endl;
@@ -167,6 +121,62 @@ int main(int argc, char *argv[]) {
 			grid->print();
 		}
 	}
+}
+
+int main(int argc, char *argv[]) {
+	const char *pcHost = "127.0.0.1";
+	int portpurple = 0;
+	int portgreen = 0;
+	int portblue = 0;
+	int portred = 0;
+	int option;
+
+	while ((option = getopt(argc,argv,"s:p:g:b:r:d")) != -1) {
+        switch (option) {
+            case 'p':
+                portpurple = atoi(optarg);
+                break;
+            case 'g':
+            	portgreen = atoi(optarg);
+            	break;
+            case 'b':
+            	portblue = atoi(optarg);
+            	break;
+            case 'r':
+            	portred = atoi(optarg);
+            	break;	
+            case 's':
+                pcHost = optarg;
+                break;
+            case 'd':
+            	debugMode = true;
+            	break;
+            default:
+                cout << "client [-s IP address] [-c port], where c is the first char of the color" << endl;
+                exit(EXIT_FAILURE);
+        }
+    }
+    BZRC* red = NULL;
+    BZRC* blue = NULL;
+    BZRC* purple = NULL;
+    BZRC* green = NULL;
+    if(portred)
+    	red = new BZRC(pcHost, portred, false);
+    if(portpurple)
+    	purple = new BZRC(pcHost, portpurple, false);
+    if(portblue)
+    	blue = new BZRC(pcHost, portblue, false);
+    if(portgreen)
+    	green = new BZRC(pcHost, portgreen, false);
+
+	PotentialField* pfield = new PotentialField(purple);
+
+	//sitting duck is red; no movement
+	green->speed(0,.5);
+	//Agent constantAgent(0, green, pfield, "green");
+	KalmanAgent scannerAgent(0, purple, pfield, "purple");
+	// Random agent
+	//RandomObstacleSearchAgent a = RandomObstacleSearchAgent(0, blue, pfield, "green");
 
 	delete purple;
 	if(red)
@@ -176,7 +186,7 @@ int main(int argc, char *argv[]) {
 	if(green)
 		delete green;
 	delete pfield;
-	delete grid;
+	// delete grid;
 	cout << "done" << endl;
 	return 0;
 }
