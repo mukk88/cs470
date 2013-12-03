@@ -6,23 +6,36 @@ unset key
 set size square
 
 unset arrow
-#set arrow from 0, 0 to -150, 0 nohead front lt 3
-#set arrow from -150, 0 to -150, -50 nohead front lt 3
-#set arrow from -150, -50 to 0, -50 nohead front lt 3
-#set arrow from 0, -50 to 0, 0 nohead front lt 3
-#set arrow from 200, 100 to 200, 330 nohead front lt 3
-#set arrow from 200, 330 to 300, 330 nohead front lt 3
-#set arrow from 300, 330 to 300, 100 nohead front lt 3
-#set arrow from 300, 100 to 200, 100 nohead front lt 3
 
+#------------------green----------------
+posgreenx = system("head -n1 values-green.dat | awk '{print $4}'")
+posgreeny = system("head -n1 values-green.dat | awk '{print $3}'")
 
-posx = 300
-posy = 100
+set arrow from posgreenx-5,posgreeny to posgreenx,posgreeny-5 nohead front lt 3 linecolor rgb "green"
+set arrow from posgreenx,posgreeny-5 to posgreenx+5,posgreeny nohead front lt 3 linecolor rgb "green"
+set arrow from posgreenx+5,posgreeny to posgreenx,posgreeny+5 nohead front lt 3 linecolor rgb "green"
+set arrow from posgreenx,posgreeny+5 to posgreenx-5,posgreeny nohead front lt 3 linecolor rgb "green"
 
-set arrow from posx-5,posy to posx,posy-5 nohead front lt 3
-set arrow from posx,posy-5 to posx+5,posy nohead front lt 3
-set arrow from posx+5,posy to posx,posy+5 nohead front lt 3
-set arrow from posx,posy+5 to posx-5,posy nohead front lt 3
+#------------------red----------------
+
+posredx = system("head -n1 values-red.dat | awk '{print $4}'")
+posredy = system("head -n1 values-red.dat | awk '{print $3}'")
+
+set arrow from posredx-5,posredy to posredx,posredy-5 nohead front lt 3 linecolor rgb "red"
+set arrow from posredx,posredy-5 to posredx+5,posredy nohead front lt 3 linecolor rgb "red"
+set arrow from posredx+5,posredy to posredx,posredy+5 nohead front lt 3 linecolor rgb "red"
+set arrow from posredx,posredy+5 to posredx-5,posredy nohead front lt 3 linecolor rgb "red"
+
+#------------------blue----------------
+
+posbluex = system("head -n1 values-blue.dat | awk '{print $4}'")
+posbluey = system("head -n1 values-blue.dat | awk '{print $3}'")
+
+set arrow from posbluex-5,posbluey to posbluex,posbluey-5 nohead front lt 3 linecolor rgb "blue"
+set arrow from posbluex,posbluey-5 to posbluex+5,posbluey nohead front lt 3 linecolor rgb "blue"
+set arrow from posbluex+5,posbluey to posbluex,posbluey+5 nohead front lt 3 linecolor rgb "blue"
+set arrow from posbluex,posbluey+5 to posbluex-5,posbluey nohead front lt 3 linecolor rgb "blue"
+
 
 # What color scheme to use
 # see http://gnuplot.sourceforge.net/demo_4.0/pm3dcolors.html
