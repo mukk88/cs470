@@ -8,34 +8,41 @@ set size square
 unset arrow
 
 #------------------green----------------
-posgreenx = system("head -n1 values-green.dat | awk '{print $4}'")
-posgreeny = system("head -n1 values-green.dat | awk '{print $5}'")
+if(system("awk '{x++}END{ print x}' values-green.dat")>0){
+	posgreenx = system("head -n1 values-green.dat | awk '{print $4}'")
+	posgreeny = system("head -n1 values-green.dat | awk '{print $5}'")
 
-set arrow from posgreenx-5,posgreeny to posgreenx,posgreeny-5 nohead front lt 3 linecolor rgb "green"
-set arrow from posgreenx,posgreeny-5 to posgreenx+5,posgreeny nohead front lt 3 linecolor rgb "green"
-set arrow from posgreenx+5,posgreeny to posgreenx,posgreeny+5 nohead front lt 3 linecolor rgb "green"
-set arrow from posgreenx,posgreeny+5 to posgreenx-5,posgreeny nohead front lt 3 linecolor rgb "green"
+	set arrow from posgreenx-5,posgreeny to posgreenx,posgreeny-5 nohead front lt 3 linecolor rgb "green"
+	set arrow from posgreenx,posgreeny-5 to posgreenx+5,posgreeny nohead front lt 3 linecolor rgb "green"
+	set arrow from posgreenx+5,posgreeny to posgreenx,posgreeny+5 nohead front lt 3 linecolor rgb "green"
+	set arrow from posgreenx,posgreeny+5 to posgreenx-5,posgreeny nohead front lt 3 linecolor rgb "green"
+}
 
 #------------------red----------------
 
-posredx = system("head -n1 values-red.dat | awk '{print $4}'")
-posredy = system("head -n1 values-red.dat | awk '{print $5}'")
+if(system("awk '{x++}END{ print x}' values-red.dat")>0){
 
-set arrow from posredx-5,posredy to posredx,posredy-5 nohead front lt 3 linecolor rgb "red"
-set arrow from posredx,posredy-5 to posredx+5,posredy nohead front lt 3 linecolor rgb "red"
-set arrow from posredx+5,posredy to posredx,posredy+5 nohead front lt 3 linecolor rgb "red"
-set arrow from posredx,posredy+5 to posredx-5,posredy nohead front lt 3 linecolor rgb "red"
+	posredx = system("head -n1 values-red.dat | awk '{print $4}'")
+	posredy = system("head -n1 values-red.dat | awk '{print $5}'")
+
+	set arrow from posredx-5,posredy to posredx,posredy-5 nohead front lt 3 linecolor rgb "red"
+	set arrow from posredx,posredy-5 to posredx+5,posredy nohead front lt 3 linecolor rgb "red"
+	set arrow from posredx+5,posredy to posredx,posredy+5 nohead front lt 3 linecolor rgb "red"
+	set arrow from posredx,posredy+5 to posredx-5,posredy nohead front lt 3 linecolor rgb "red"
+}
 
 #------------------blue----------------
 
-posbluex = system("head -n1 values-blue.dat | awk '{print $4}'")
-posbluey = system("head -n1 values-blue.dat | awk '{print $5}'")
+if(system("awk '{x++}END{ print x}' values-blue.dat")>0){
 
-set arrow from posbluex-5,posbluey to posbluex,posbluey-5 nohead front lt 3 linecolor rgb "blue"
-set arrow from posbluex,posbluey-5 to posbluex+5,posbluey nohead front lt 3 linecolor rgb "blue"
-set arrow from posbluex+5,posbluey to posbluex,posbluey+5 nohead front lt 3 linecolor rgb "blue"
-set arrow from posbluex,posbluey+5 to posbluex-5,posbluey nohead front lt 3 linecolor rgb "blue"
+	posbluex = system("head -n1 values-blue.dat | awk '{print $4}'")
+	posbluey = system("head -n1 values-blue.dat | awk '{print $5}'")
 
+	set arrow from posbluex-5,posbluey to posbluex,posbluey-5 nohead front lt 3 linecolor rgb "blue"
+	set arrow from posbluex,posbluey-5 to posbluex+5,posbluey nohead front lt 3 linecolor rgb "blue"
+	set arrow from posbluex+5,posbluey to posbluex,posbluey+5 nohead front lt 3 linecolor rgb "blue"
+	set arrow from posbluex,posbluey+5 to posbluex-5,posbluey nohead front lt 3 linecolor rgb "blue"
+}
 
 # What color scheme to use
 # see http://gnuplot.sourceforge.net/demo_4.0/pm3dcolors.html
