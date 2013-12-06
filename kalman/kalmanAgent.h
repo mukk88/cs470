@@ -1,5 +1,6 @@
 #ifndef KALMANAGENT_H
 #define KALMANAGENT_H
+#include <sstream>
 #include "command.h"
 #include <algorithm>
 #include <vector>
@@ -64,7 +65,7 @@ public:
 
 	}
 
-	void update(){
+	string update(){
 		double x, y;
 		std::vector <otank_t> otherTanks;
 		commandCenter->get_othertanks(&otherTanks);
@@ -81,13 +82,15 @@ public:
 		updateMean(Ktplus1, z);
 		updateError(Ktplus1);
 
-		ofstream myfile;
-		string fileName = "values-" + color + ".dat";
-		myfile.open (fileName.c_str());
 		//row sigmax sigmay x y
-		myfile << 0 << " " << Sigmat(0,0) << " " << Sigmat(3,3) << " " << 
-			u(0,0) << " " << u(3,0);
-		myfile.close();
+		double sigmax = Sigmat(0,0);
+		double sigmay = Sigmat(3,3);
+		double meanx = u(0,0);
+		double meany = u(3,0);
+		stringstream ss;
+		ss << 0 << " " << sigmax << " " << sigmay << " " << 
+			meanx << " " << meany;
+		return ss.str();
 	}
 
 	void updateMean(MatrixXd Ktplus1, MatrixXd z){

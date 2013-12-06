@@ -60,12 +60,20 @@ int main(int argc, char *argv[]) {
     KalmanAgent kalmanBlue(0, purple, .5, .1, "blue");
     KalmanAgent kalmanRed(0, purple, .5, .1, "red");
 
+    ofstream greenFile;
+    ofstream redFile;
+    ofstream blueFile;
+    greenFile.open ("values-green.dat");
+    redFile.open ("values-red.dat");
+    blueFile.open ("values-blue.dat");
+
     while (true){
-        sleep(.5);
+        // usleep(500000);
         random.move();
-        kalmanGreen.update();
-        kalmanBlue.update();
-        kalmanRed.update();
+        greenFile << kalmanGreen.update();
+        redFile << kalmanBlue.update();
+        blueFile << kalmanRed.update();
+        sleep(1);
     }
 
     if(purple)
