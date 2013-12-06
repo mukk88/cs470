@@ -54,11 +54,13 @@ int main(int argc, char *argv[]) {
     if(portgreen)
     	green = new BZRC(pcHost, portgreen, false);
 
-    green->speed(0,0.1);
+    red->speed(0,0.3);
+
+    double sleepAmount = 1;    
     RandomAgent random(0, blue, 10);
-    KalmanAgent kalmanGreen(0, purple, .5, .1, "green");
-    KalmanAgent kalmanBlue(0, purple, .5, .1, "blue");
-    KalmanAgent kalmanRed(0, purple, .5, .1, "red");
+    KalmanAgent kalmanGreen(0, purple, sleepAmount, .1, "green");
+    KalmanAgent kalmanBlue(0, purple, sleepAmount, .1, "blue");
+    KalmanAgent kalmanRed(0, purple, sleepAmount, .1, "red");
 
     ofstream greenFile;
     ofstream redFile;
@@ -67,14 +69,25 @@ int main(int argc, char *argv[]) {
     redFile.open ("values-red.dat");
     blueFile.open ("values-blue.dat");
 
-    while (true){
-        // usleep(500000);
+    for (int i = 0; i < 20; i++){
+        sleep(sleepAmount);
         random.move();
         greenFile << kalmanGreen.update();
         redFile << kalmanBlue.update();
         blueFile << kalmanRed.update();
-        sleep(1);
     }
+
+    for (int i = 0; i < 10; i++){
+        sleep(sleepAmount);
+        random.move();
+        greenFile << kalmanGreen.predict();
+        redFile << kalmanBlue.predict();
+        blueFile << kalmanRed.predict();
+    }
+
+    greenFile.close();
+    redFile.close();
+    blueFile.close();
 
     if(purple)
         delete purple;

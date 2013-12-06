@@ -65,7 +65,7 @@ public:
 
 	}
 
-	string update(){
+	MatrixXd getObservation(){
 		double x, y;
 		std::vector <otank_t> otherTanks;
 		commandCenter->get_othertanks(&otherTanks);
@@ -78,10 +78,18 @@ public:
 		}
 		MatrixXd z(2, 1);
 		z << x, y;
+		return z;
+	}
+
+	string update(){
+		MatrixXd z = getObservation();
 		MatrixXd Ktplus1 = GetKtplus1();
 		updateMean(Ktplus1, z);
 		updateError(Ktplus1);
+		return outputValues();
+	}
 
+	string outputValues(){
 		//row sigmax sigmay x y
 		double sigmax = Sigmat(0,0);
 		double sigmay = Sigmat(3,3);
@@ -89,8 +97,16 @@ public:
 		double meany = u(3,0);
 		stringstream ss;
 		ss << 0 << " " << sigmax << " " << sigmay << " " << 
-			meanx << " " << meany;
+			meanx << " " << meany << "\n";
 		return ss.str();
+	}
+
+	string predict(){
+		MatrixXd z = getObservation();
+		MatrixXd Ktplus1 = GetKtplus1();
+		u = F*u;
+		updateError(Ktplus1);
+		return outputValues();
 	}
 
 	void updateMean(MatrixXd Ktplus1, MatrixXd z){
